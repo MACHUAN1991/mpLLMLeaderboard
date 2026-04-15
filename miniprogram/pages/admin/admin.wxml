@@ -1,0 +1,47 @@
+<view class="container">
+  <view class="header">
+    <text class="title">Arena 排名管理</text>
+    <text class="subtitle">上传截图进行 AI 解析</text>
+  </view>
+
+  <view class="upload-area" bindtap="chooseImage">
+    <image wx:if="{{imagePath}}" src="{{imagePath}}" mode="aspectFit" class="preview-image" />
+    <view wx:else class="upload-placeholder">
+      <text class="icon">📷</text>
+      <text class="text">点击选择 Arena 截图</text>
+    </view>
+  </view>
+
+  <view class="actions">
+    <button wx:if="{{!imagePath}}" class="btn-primary" bindtap="chooseImage">选择图片</button>
+    <button wx:if="{{imagePath && !analyzing}}" class="btn-primary" bindtap="uploadAndAnalyze">开始解析</button>
+    <button wx:if="{{analyzing}}" class="btn-primary" loading>
+      {{analyzingStep || '解析中...'}}
+    </button>
+  </view>
+
+  <view wx:if="{{result}}" class="result-preview">
+    <view class="result-header">
+      <text class="result-title">解析结果</text>
+      <text class="result-date">{{result.date || result.Date}}</text>
+    </view>
+    <view class="result-summary">
+      <text class="summary-item">共 {{result.rankings.length || 0}} 个模型</text>
+    </view>
+    <view class="result-actions">
+      <button class="btn-secondary" bindtap="clearResult">继续上传</button>
+    </view>
+  </view>
+
+  <view wx:if="{{error}}" class="error-tip">
+    <text>{{error}}</text>
+  </view>
+
+  <view class="tips">
+    <text class="tips-title">操作说明</text>
+    <text class="tips-item">1. 点击上方区域选择截图</text>
+    <text class="tips-item">2. 点击「开始解析」</text>
+    <text class="tips-item">3. 解析结果自动保存到数据库</text>
+    <text class="tips-item">4. 用户可在首页查看历史记录</text>
+  </view>
+</view>

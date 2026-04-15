@@ -1,9 +1,58 @@
 <view class="container">
   <view class="header">
-    <text class="title">Arena 排名解析结果</text>
-    <text class="date">{{date}}</text>
+    <view class="header-top">
+      <text class="title">解析结果</text>
+      <text class="date">{{date}}</text>
+    </view>
+    <view class="header-actions">
+      <text class="stats">{{stats.showing}} / {{stats.total}}</text>
+    </view>
   </view>
 
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <view class="search-input-wrap">
+      <text class="search-icon">🔍</text>
+      <input
+        class="search-input"
+        placeholder="搜索模型名称..."
+        value="{{searchKey}}"
+        bindinput="onSearch"
+      />
+      <view wx:if="{{searchKey}}" class="clear-btn" bindtap="onClearSearch">✕</view>
+    </view>
+    <view class="filter-btn {{showFilter ? 'active' : ''}}" bindtap="toggleFilter">
+      <text>筛选</text>
+    </view>
+  </view>
+
+  <!-- 筛选面板 -->
+  <view wx:if="{{showFilter}}" class="filter-panel">
+    <view class="filter-section">
+      <text class="filter-label">厂商</text>
+      <picker mode="selector" range="{{orgPickerRange}}" bindchange="onFilterOrg">
+        <view class="picker-value">
+          {{filterOrg || '全部厂商'}}
+        </view>
+      </picker>
+    </view>
+
+    <view class="filter-section">
+      <text class="filter-label">排名范围</text>
+      <picker mode="selector" range="{{['全部', '前10名', '11-50名', '51-100名', '100+']}}" bindchange="onFilterRank">
+        <view class="picker-value">
+          {{rankRange === 'all' ? '全部' : rankRange}}
+        </view>
+      </picker>
+    </view>
+
+    <view class="filter-actions">
+      <button class="btn-reset" bindtap="onResetFilter">重置</button>
+      <button class="btn-apply" bindtap="toggleFilter">应用</button>
+    </view>
+  </view>
+
+  <!-- 排名列表 -->
   <view class="ranking-list">
     <view class="ranking-item header-row">
       <text class="col-rank">排名</text>
@@ -12,14 +61,19 @@
       <text class="col-score">分数</text>
     </view>
 
-    <view wx:for="{{rankings}}" wx:key="rank" class="ranking-item {{item.rank <= 3 ? 'top-' + item.rank : ''}}">
-      <text class="col-rank {{item.rank <= 3 ? 'rank-top' : ''}}">#{{item.rank}}</text>
+    <view wx:for="{{filteredRankings}}" wx:key="rank" class="ranking-item {{item.rank <= 3 ? 'top-' + item.rank : ''}}">
+      <view class="rank-badge {{item.rank <= 3 ? 'badge-' + item.rank : ''}}">#{{item.rank}}</view>
       <text class="col-model">{{item.modelName}}</text>
       <text class="col-org">{{item.organization}}</text>
-      <text class="col-score {{item.rank <= 3 ? 'score-top' : ''}}">{{item.score}}</text>
+      <text class="col-score {{item.rank <= 3 ? 'score-gold' : ''}}">{{item.score}}</text>
+    </view>
+
+    <view wx:if="{{filteredRankings.length === 0}}" class="empty-filter">
+      <text>没有符合条件的模型</text>
     </view>
   </view>
 
+  <!-- 原始数据 -->
   <view class="raw-data">
     <view class="raw-header">
       <text class="raw-title">原始 JSON 数据</text>
@@ -30,5 +84,5 @@
     </view>
   </view>
 
-  <button class="btn-back" bindtap="goBack">返回首页</button>
+  <button class="btn-back" bindtap="goBack">返回</button>
 </view>

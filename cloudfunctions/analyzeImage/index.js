@@ -42,11 +42,12 @@ async function downloadImageAsBase64(url) {
 }
 
 /**
+
  * 调用 MiniMax 视觉理解 API
- * 方式1: 使用 base64 图片（推荐，较慢但可靠）
  */
 async function analyzeWithBase64(base64Image) {
   try {
+    console.log('调用 MiniMax API...');
     const response = await axios.post(
       MINIMAX_API_URL,
       {
@@ -64,14 +65,14 @@ async function analyzeWithBase64(base64Image) {
           'Authorization': `Bearer ${MINIMAX_API_KEY}`,
           'Content-Type': 'application/json'
         },
-        timeout: 120000,
+        timeout: 60000,  // 60秒超时
         maxBodyLength: Infinity,
         maxContentLength: Infinity
       }
     );
     return response.data;
   } catch (err) {
-    console.error('MiniMax API (base64) 调用失败:', err.message);
+    console.error(`MiniMax API 调用失败:`, err.message);
     throw new Error('AI 图片解析失败');
   }
 }
@@ -98,7 +99,7 @@ async function analyzeWithUrl(imageUrl) {
           'Authorization': `Bearer ${MINIMAX_API_KEY}`,
           'Content-Type': 'application/json'
         },
-        timeout: 60000
+        timeout: 25000
       }
     );
     return response.data;

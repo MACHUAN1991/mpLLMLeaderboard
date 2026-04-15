@@ -1,0 +1,159 @@
+/* pages/admin/admin.wxss */
+.container {
+  min-height: 100vh;
+  padding: 40rpx;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  box-sizing: border-box;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 60rpx;
+}
+
+.title {
+  display: block;
+  font-size: 44rpx;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 16rpx;
+}
+
+.subtitle {
+  display: block;
+  font-size: 26rpx;
+  color: #8892b0;
+}
+
+.upload-area {
+  width: 100%;
+  height: 500rpx;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2rpx dashed #64ffda;
+  border-radius: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 40rpx;
+  overflow: hidden;
+}
+
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.icon {
+  font-size: 100rpx;
+  margin-bottom: 20rpx;
+}
+
+.text {
+  font-size: 28rpx;
+  color: #64ffda;
+}
+
+.preview-image {
+  width: 100%;
+  height: 100%;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 40rpx;
+  gap: 20rpx;
+}
+
+.btn-primary {
+  background: #64ffda;
+  color: #1a1a2e;
+  font-weight: bold;
+  border-radius: 12rpx;
+  padding: 24rpx 60rpx;
+  font-size: 30rpx;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #64ffda;
+  border: 1rpx solid #64ffda;
+  border-radius: 12rpx;
+  padding: 20rpx 40rpx;
+  font-size: 26rpx;
+}
+
+.result-preview {
+  background: rgba(100, 255, 218, 0.1);
+  border: 1rpx solid rgba(100, 255, 218, 0.3);
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 40rpx;
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 1rpx solid rgba(100, 255, 218, 0.2);
+}
+
+.result-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #64ffda;
+}
+
+.result-date {
+  font-size: 24rpx;
+  color: #8892b0;
+}
+
+.result-summary {
+  text-align: center;
+  margin-bottom: 24rpx;
+}
+
+.summary-item {
+  font-size: 28rpx;
+  color: #fff;
+}
+
+.result-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.error-tip {
+  background: rgba(255, 82, 82, 0.1);
+  border: 1rpx solid #ff5252;
+  border-radius: 12rpx;
+  padding: 24rpx;
+  margin-bottom: 40rpx;
+  color: #ff5252;
+  text-align: center;
+}
+
+.tips {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 16rpx;
+  padding: 30rpx;
+}
+
+.tips-title {
+  display: block;
+  font-size: 26rpx;
+  color: #64ffda;
+  margin-bottom: 16rpx;
+  font-weight: bold;
+}
+
+.tips-item {
+  display: block;
+  font-size: 24rpx;
+  color: #8892b0;
+  line-height: 1.8;
+}

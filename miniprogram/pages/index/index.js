@@ -1,107 +1,103 @@
 // pages/index/index.js
 Page({
   data: {
-    imagePath: '',
-    analyzing: false,
-    result: null,
-    error: null
+    records: [],
+    loading: true,
+    empty: true
   },
 
-  // 选择图片
-  chooseImage: function () {
-    wx.chooseImage({
-      count: 1,
-      sizeType: ['compressed'],
-      sourceType: ['album', 'camera'],
+  onLoad: function () {
+    this.loadHistory();
+  },
+
+  onShow: function () {
+    this.loadHistory();
+  },
+
+  onPullDownRefresh: function () {
+    this.loadHistory(() => {
+      wx.stopPullDownRefresh();
+    });
+  },
+
+  loadHistory: function (callback) {
+    this.setData({ loading: true });
+
+    wx.cloud.callFunction({
+      name: 'getHistory',
+      data: { page: 1, pageSize: 50 },
       success: (res) => {
-        const tempFilePath = res.tempFilePaths[0];
-        this.setData({ imagePath: tempFilePath });
+        console.log('历史记录:', res.result);
+        if (res.result.success) {
+          this.setData({
+            records: res.result.data || [],
+            empty: !res.result.data || res.result.data.length === 0,
+            loading: false
+          });
+        } else {
+          console.error('获取失败:', res.result.error);
+          this.setData({ empty: true, loading: false });
+        }
       },
       fail: (err) => {
-        wx.showToast({ title: '选择图片失败', icon: 'none' });
-        console.error(err);
+        console.error('调用失败:', err);
+        this.setData({ empty: true, loading: false });
+      },
+      complete: () => {
+        if (callback) callback();
       }
     });
   },
 
-  // 获取文件大小
-  getFileSize: function (filePath) {
-    return new Promise((resolve, reject) => {
-      wx.getFileSystemManager().getFileInfo({
-        filePath: filePath,
-        success: (res) => resolve(res.size),
-        fail: (err) => reject(err)
-      });
+  viewDetail: function (e) {
+    const { recordid, date } = e.currentTarget.dataset;
+    wx.navigateTo({
+      url: `/pages/result/result?recordId=${recordid}&date=${encodeURIComponent(date)}`
     });
   },
 
-  // 上传并分析
-  uploadAndAnalyze: async function () {
-    if (!this.data.imagePath) {
-      wx.showToast({ title: '请先选择图片', icon: 'none' });
-      return;
-    }
+  // 跳转到管理页
+  goToAdmin: function () {
+    wx.navigateTo({
+      url: '/pages/admin/admin'
+    });
+  },
 
-    this.setData({ analyzing: true, error: null });
-
-    try {
-      let filePath = this.data.imagePath;
-
-      // 1. 检查并压缩图片（如果原图大于 300KB）
-      try {
-        const fileSize = await this.getFileSize(this.data.imagePath);
-        console.log('原图大小:', fileSize);
-        if (fileSize > 300 * 1024) {
-          wx.showLoading({ title: '压缩图片中...' });
-          const compressResult = await wx.compressImage({
-            src: this.data.imagePath,
-            quality: 30  // 更激进压缩
+  // 删除记录
+  deleteRecord: function (e) {
+    const { recordid } = e.currentTarget.dataset;
+    wx.showModal({
+      title: '确认删除',
+      content: '确定要删除这条记录吗？',
+      success: (res) => {
+        if (res.confirm) {
+          wx.showLoading({ title: '删除中...' });
+          wx.cloud.callFunction({
+            name: 'deleteRecord',
+            data: { recordId: recordid },
+            success: (res) => {
+              wx.hideLoading();
+              if (res.result.success) {
+                wx.showToast({ title: '删除成功', icon: 'success' });
+                this.loadHistory();
+              } else {
+                wx.showToast({ title: '删除失败', icon: 'none' });
+              }
+            },
+            fail: (err) => {
+              wx.hideLoading();
+              wx.showToast({ title: '删除失败', icon: 'none' });
+              console.error(err);
+            }
           });
-          wx.hideLoading();
-          if (compressResult.tempFilePath) {
-            filePath = compressResult.tempFilePath;
-            console.log('压缩后路径:', filePath);
-          }
         }
-      } catch (e) {
-        console.warn('压缩失败，使用原图:', e);
       }
+    });
+  },
 
-      // 2. 上传图片到云存储
-      wx.showLoading({ title: '上传图片中...' });
-      const uploadResult = await wx.cloud.uploadFile({
-        cloudPath: `arena/${Date.now()}.jpg`,
-        filePath: filePath
-      });
-
-      const fileID = uploadResult.fileID;
-      wx.hideLoading();
-
-      // 3. 调用云函数分析图片
-      wx.showLoading({ title: 'AI 解析中...' });
-      const analyzeResult = await wx.cloud.callFunction({
-        name: 'analyzeImage',
-        data: { fileID }
-      });
-
-      wx.hideLoading();
-
-      if (analyzeResult.result.success) {
-        wx.navigateTo({
-          url: `/pages/result/result?data=${encodeURIComponent(JSON.stringify(analyzeResult.result.data))}`
-        });
-      } else {
-        this.setData({ error: analyzeResult.result.error || '解析失败' });
-        wx.showToast({ title: analyzeResult.result.error || '解析失败', icon: 'none' });
-      }
-    } catch (err) {
-      wx.hideLoading();
-      const errorMsg = err.message || err.errMsg || '分析失败';
-      this.setData({ error: errorMsg });
-      wx.showToast({ title: errorMsg, icon: 'none' });
-      console.error(err);
-    } finally {
-      this.setData({ analyzing: false });
-    }
+  formatDate: function (timestamp) {
+    if (!timestamp) return '';
+    const date = new Date(timestamp);
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   }
 });

@@ -1,12 +1,13 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/admin/admin",
     "pages/result/result"
   ],
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#1a1a2e",
-    "navigationBarTitleText": "LLM 排名解析",
+    "navigationBarTitleText": "LLM 排名管理",
     "navigationBarTextStyle": "white"
   },
   "style": "v2",

@@ -1,31 +1,48 @@
 <view class="container">
   <view class="header">
-    <text class="title">Arena LLM 排名解析</text>
-    <text class="subtitle">上传截图，AI 自动识别模型排名</text>
-  </view>
-
-  <view class="upload-area" bindtap="chooseImage">
-    <image wx:if="{{imagePath}}" src="{{imagePath}}" mode="aspectFit" class="preview-image" />
-    <view wx:else class="upload-placeholder">
-      <text class="icon">📷</text>
-      <text class="text">点击选择 Arena 截图</text>
+    <text class="title">Arena LLM 排名</text>
+    <view class="header-right">
+      <text class="admin-link" bindtap="goToAdmin">上传</text>
     </view>
   </view>
 
-  <view class="actions">
-    <button wx:if="{{!imagePath}}" class="btn-primary" bindtap="chooseImage">选择图片</button>
-    <button wx:if="{{imagePath && !analyzing}}" class="btn-primary" bindtap="uploadAndAnalyze">开始解析</button>
-    <button wx:if="{{analyzing}}" class="btn-primary" loading>解析中...</button>
+  <view class="subtitle">Chatbot Arena 排行榜查看</view>
+
+  <view class="section-title">
+    <text>历史记录 ({{records.length}})</text>
   </view>
 
-  <view wx:if="{{error}}" class="error-tip">
-    <text>{{error}}</text>
+  <view wx:if="{{loading}}" class="loading">
+    <text>加载中...</text>
   </view>
 
-  <view class="tips">
-    <text class="tips-title">支持识别的内容</text>
-    <text class="tips-item">• Chatbot Arena 排行榜截图</text>
-    <text class="tips-item">• 模型名称、排名、分数</text>
-    <text class="tips-item">• LMSYS 榜单截图</text>
+  <view wx:elif="{{empty}}" class="empty-state">
+    <text class="empty-icon">📊</text>
+    <text class="empty-text">暂无排名数据</text>
+    <text class="empty-hint">管理员上传后将显示在这里</text>
+  </view>
+
+  <view wx:else class="record-list">
+    <view wx:for="{{records}}" wx:key="recordId" class="record-card" data-recordid="{{item.recordId}}" data-date="{{item.date}}" bindtap="viewDetail">
+      <view class="card-header">
+        <text class="card-date">{{item.date}}</text>
+        <view class="card-actions">
+          <text class="card-count">{{item.totalModels}} 个模型</text>
+          <text class="delete-btn" data-recordid="{{item.recordId}}" catchtap="deleteRecord">删除</text>
+        </view>
+      </view>
+
+      <view class="top3-preview">
+        <view wx:for="{{item.top3}}" wx:for-item="topItem" wx:for-index="idx" wx:key="rank" class="top-item top-{{idx + 1}}">
+          <text class="top-rank">#{{topItem.rank}}</text>
+          <text class="top-name">{{topItem.modelName}}</text>
+        </view>
+      </view>
+
+      <view class="card-footer">
+        <text class="card-time">{{formatDate(item.timestamp)}}</text>
+        <text class="view-more">点击查看 →</text>
+      </view>
+    </view>
   </view>
 </view>

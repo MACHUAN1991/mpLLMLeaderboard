@@ -1,0 +1,38 @@
+<view class="container">
+  <view class="header">
+    <text class="title">历史记录</text>
+    <text class="subtitle">{{records.length}} 条记录</text>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:elif="{{empty}}" class="empty-state">
+    <text class="empty-icon">📋</text>
+    <text class="empty-text">暂无历史记录</text>
+    <text class="empty-hint">上传截图分析后会保存在这里</text>
+  </view>
+
+  <view wx:else class="record-list">
+    <view wx:for="{{records}}" wx:key="recordId" class="record-card" data-recordid="{{item.recordId}}" data-date="{{item.date}}" bindtap="viewDetail">
+      <view class="card-header">
+        <text class="card-date">{{item.date}}</text>
+        <text class="card-count">{{item.totalModels}} 个模型</text>
+      </view>
+
+      <view class="top3-preview">
+        <view wx:for="{{item.top3}}" wx:for-item="topItem" wx:for-index="idx" class="top-item top-{{idx + 1}}">
+          <text class="top-rank">#{{topItem.rank}}</text>
+          <text class="top-name">{{topItem.modelName}}</text>
+          <text class="top-org">{{topItem.organization}}</text>
+        </view>
+      </view>
+
+      <view class="card-footer">
+        <text class="card-time">{{formatDate(item.timestamp)}}</text>
+        <view class="delete-btn" data-recordid="{{item.recordId}}" data-imagefileid="{{item.imageFileId}}" catchtap="deleteRecord">删除</view>
+      </view>
+    </view>
+  </view>
+</view>
