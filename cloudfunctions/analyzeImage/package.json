@@ -1,0 +1,10 @@
+{
+  "name": "analyzeImage",
+  "version": "1.0.0",
+  "description": "AI image analysis cloud function using MiniMax API",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3",
+    "axios": "^1.6.0"
+  }
+}

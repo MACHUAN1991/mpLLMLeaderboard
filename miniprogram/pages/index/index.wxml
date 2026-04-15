@@ -1,0 +1,31 @@
+<view class="container">
+  <view class="header">
+    <text class="title">Arena LLM 排名解析</text>
+    <text class="subtitle">上传截图，AI 自动识别模型排名</text>
+  </view>
+
+  <view class="upload-area" bindtap="chooseImage">
+    <image wx:if="{{imagePath}}" src="{{imagePath}}" mode="aspectFit" class="preview-image" />
+    <view wx:else class="upload-placeholder">
+      <text class="icon">📷</text>
+      <text class="text">点击选择 Arena 截图</text>
+    </view>
+  </view>
+
+  <view class="actions">
+    <button wx:if="{{!imagePath}}" class="btn-primary" bindtap="chooseImage">选择图片</button>
+    <button wx:if="{{imagePath && !analyzing}}" class="btn-primary" bindtap="uploadAndAnalyze">开始解析</button>
+    <button wx:if="{{analyzing}}" class="btn-primary" loading>解析中...</button>
+  </view>
+
+  <view wx:if="{{error}}" class="error-tip">
+    <text>{{error}}</text>
+  </view>
+
+  <view class="tips">
+    <text class="tips-title">支持识别的内容</text>
+    <text class="tips-item">• Chatbot Arena 排行榜截图</text>
+    <text class="tips-item">• 模型名称、排名、分数</text>
+    <text class="tips-item">• LMSYS 榜单截图</text>
+  </view>
+</view>

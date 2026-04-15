@@ -1,0 +1,34 @@
+<view class="container">
+  <view class="header">
+    <text class="title">Arena 排名解析结果</text>
+    <text class="date">{{date}}</text>
+  </view>
+
+  <view class="ranking-list">
+    <view class="ranking-item header-row">
+      <text class="col-rank">排名</text>
+      <text class="col-model">模型</text>
+      <text class="col-org">厂商</text>
+      <text class="col-score">分数</text>
+    </view>
+
+    <view wx:for="{{rankings}}" wx:key="rank" class="ranking-item {{item.rank <= 3 ? 'top-' + item.rank : ''}}">
+      <text class="col-rank {{item.rank <= 3 ? 'rank-top' : ''}}">#{{item.rank}}</text>
+      <text class="col-model">{{item.modelName}}</text>
+      <text class="col-org">{{item.organization}}</text>
+      <text class="col-score {{item.rank <= 3 ? 'score-top' : ''}}">{{item.score}}</text>
+    </view>
+  </view>
+
+  <view class="raw-data">
+    <view class="raw-header">
+      <text class="raw-title">原始 JSON 数据</text>
+      <button class="copy-btn" bindtap="copyData" size="mini">复制</button>
+    </view>
+    <view class="json-content">
+      <text>{{rawData}}</text>
+    </view>
+  </view>
+
+  <button class="btn-back" bindtap="goBack">返回首页</button>
+</view>
