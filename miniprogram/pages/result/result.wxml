@@ -2,7 +2,7 @@
   <view class="header">
     <view class="header-top">
       <text class="title">排行榜</text>
-      <view class="source-badge source-{{source}}">{{source === 'huggingface' ? 'HuggingFace' : 'Arena'}}</view>
+      <view class="source-badge source-{{source}}">{{source === 'huggingface' ? 'HuggingFace' : source === 'artificial-analysis' ? 'AA' : 'Arena'}}</view>
       <text class="date">{{date}}</text>
     </view>
     <view class="header-actions">

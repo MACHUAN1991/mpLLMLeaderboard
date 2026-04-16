@@ -4,13 +4,21 @@ Page({
     records: [],
     loading: true,
     empty: true,
-    currentSource: 'all',  // 筛选来源：all/arena/huggingface
+    currentSource: 'all',  // 筛选来源：all/arena/huggingface/artificial-analysis
     filteredCount: 0,
     displayRecords: []
   },
 
   onLoad: function () {
     this.loadHistory();
+  },
+
+  // 分享给朋友
+  onShareAppMessage: function () {
+    return {
+      title: '全球AI大模型排名',
+      path: '/pages/index/index'
+    };
   },
 
   onShow: function () {

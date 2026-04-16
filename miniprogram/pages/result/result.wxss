@@ -35,6 +35,11 @@
   color: #ffa500;
 }
 
+.source-badge.source-artificial-analysis {
+  background: rgba(138, 43, 226, 0.2);
+  color: #9370db;
+}
+
 .title {
   font-size: 36rpx;
   font-weight: bold;
