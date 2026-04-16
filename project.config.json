@@ -37,7 +37,7 @@
     "disableSWC": true
   },
   "cloudfunctionTemplateRoot": "cloudfunctionTemplate/",
-  "libVersion": "2.14.0",
+  "libVersion": "3.15.2",
   "condition": {},
   "simulatorPluginLibVersion": {},
   "packOptions": {

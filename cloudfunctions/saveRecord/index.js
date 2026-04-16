@@ -13,7 +13,7 @@ function generateUUID() {
 
 exports.main = async (event, context) => {
   const db = cloud.database();
-  const { date, rankings, imageFileId } = event;
+  const { date, rankings, imageFileId, source } = event;
 
   if (!rankings || !Array.isArray(rankings)) {
     return { success: false, error: '缺少排名数据' };
@@ -39,6 +39,7 @@ exports.main = async (event, context) => {
       data: {
         recordId,
         date: date || '',
+        source: source || 'arena',  // 添加来源字段
         timestamp,
         imageFileId: imageFileId || '',
         totalModels: rankings.length,

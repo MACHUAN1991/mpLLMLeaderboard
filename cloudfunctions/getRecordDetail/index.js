@@ -35,6 +35,7 @@ exports.main = async (event, context) => {
       success: true,
       data: {
         date: record.date,
+        source: record.source || 'arena',
         rankings: rankings
       }
     };

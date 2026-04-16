@@ -1,14 +1,22 @@
 <view class="container">
   <view class="header">
-    <text class="title">Arena 排名管理</text>
+    <text class="title">AI 排名管理</text>
     <text class="subtitle">上传截图进行 AI 解析</text>
+  </view>
+
+  <view class="source-selector">
+    <text class="selector-label">选择排名来源：</text>
+    <view class="source-tabs">
+      <view class="source-tab {{source === 'arena' ? 'active' : ''}}" data-source="arena" bindtap="selectSource">Arena</view>
+      <view class="source-tab {{source === 'huggingface' ? 'active' : ''}}" data-source="huggingface" bindtap="selectSource">Hugging Face</view>
+    </view>
   </view>
 
   <view class="upload-area" bindtap="chooseImage">
     <image wx:if="{{imagePath}}" src="{{imagePath}}" mode="aspectFit" class="preview-image" />
     <view wx:else class="upload-placeholder">
       <text class="icon">📷</text>
-      <text class="text">点击选择 Arena 截图</text>
+      <text class="text">点击选择截图</text>
     </view>
   </view>
 
@@ -39,9 +47,10 @@
 
   <view class="tips">
     <text class="tips-title">操作说明</text>
-    <text class="tips-item">1. 点击上方区域选择截图</text>
-    <text class="tips-item">2. 点击「开始解析」</text>
-    <text class="tips-item">3. 解析结果自动保存到数据库</text>
-    <text class="tips-item">4. 用户可在首页查看历史记录</text>
+    <text class="tips-item">1. 选择排名来源（Arena / Hugging Face）</text>
+    <text class="tips-item">2. 点击上方区域选择截图</text>
+    <text class="tips-item">3. 点击「开始解析」</text>
+    <text class="tips-item">4. 解析结果自动保存到数据库</text>
+    <text class="tips-item">5. 用户可在首页查看历史记录</text>
   </view>
 </view>

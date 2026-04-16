@@ -2,6 +2,7 @@
 Page({
   data: {
     date: '',
+    source: 'arena',  // 来源：arena / huggingface
     rankings: [],
     filteredRankings: [],
     searchKey: '',
@@ -36,7 +37,8 @@ Page({
         wx.hideLoading();
         console.log('getRecordDetail 返回:', res.result);
         if (res.result.success) {
-          this.processRankings(res.result.data, decodeURIComponent(date || ''));
+          const source = res.result.data.source || 'arena';
+          this.processRankings(res.result.data, decodeURIComponent(date || ''), source);
         } else {
           wx.showToast({ title: '加载失败', icon: 'none' });
         }
@@ -59,7 +61,16 @@ Page({
     }
   },
 
-  processRankings: function (data, date) {
+  // 格式化日期：2026.4.16
+  formatDate: function (dateStr) {
+    if (!dateStr) return '';
+    // 尝试解析日期字符串
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return dateStr;
+    return `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
+  },
+
+  processRankings: function (data, date, source) {
     console.log('processRankings 收到的数据:', data);
 
     // 兼容两种格式：大写 Ranking / 小写 rankings / Rankings
@@ -95,7 +106,8 @@ Page({
     const orgPickerRange = ['', ...allOrganizations];
 
     this.setData({
-      date: date,
+      date: this.formatDate(date),
+      source: source || 'arena',
       rankings: normalizedRankings,
       filteredRankings: normalizedRankings,
       organizations: allOrganizations,

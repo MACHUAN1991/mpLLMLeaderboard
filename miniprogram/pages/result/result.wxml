@@ -1,7 +1,8 @@
 <view class="container">
   <view class="header">
     <view class="header-top">
-      <text class="title">解析结果</text>
+      <text class="title">排行榜</text>
+      <view class="source-badge source-{{source}}">{{source === 'huggingface' ? 'HuggingFace' : 'Arena'}}</view>
       <text class="date">{{date}}</text>
     </view>
     <view class="header-actions">
@@ -70,17 +71,6 @@
 
     <view wx:if="{{filteredRankings.length === 0}}" class="empty-filter">
       <text>没有符合条件的模型</text>
-    </view>
-  </view>
-
-  <!-- 原始数据 -->
-  <view class="raw-data">
-    <view class="raw-header">
-      <text class="raw-title">原始 JSON 数据</text>
-      <button class="copy-btn" bindtap="copyData" size="mini">复制</button>
-    </view>
-    <view class="json-content">
-      <text>{{rawData}}</text>
     </view>
   </view>
 

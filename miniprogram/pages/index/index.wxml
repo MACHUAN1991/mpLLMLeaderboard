@@ -1,15 +1,13 @@
 <view class="container">
-  <view class="header">
-    <text class="title">Arena LLM 排名</text>
-    <view class="header-right">
-      <text class="admin-link" bindtap="goToAdmin">上传</text>
-    </view>
+  <view class="header-row">
+    <text class="title">全球AI大模型排名</text>
+    <text class="admin-link" bindtap="goToAdmin">管理</text>
   </view>
 
-  <view class="subtitle">Chatbot Arena 排行榜查看</view>
-
-  <view class="section-title">
-    <text>历史记录 ({{records.length}})</text>
+  <view class="source-tabs">
+    <view class="source-tab {{currentSource === 'all' ? 'active' : ''}}" data-source="all" bindtap="switchSource">全部</view>
+    <view class="source-tab {{currentSource === 'arena' ? 'active' : ''}}" data-source="arena" bindtap="switchSource">Arena</view>
+    <view class="source-tab {{currentSource === 'huggingface' ? 'active' : ''}}" data-source="huggingface" bindtap="switchSource">Hugging Face</view>
   </view>
 
   <view wx:if="{{loading}}" class="loading">
@@ -23,8 +21,9 @@
   </view>
 
   <view wx:else class="record-list">
-    <view wx:for="{{records}}" wx:key="recordId" class="record-card" data-recordid="{{item.recordId}}" data-date="{{item.date}}" bindtap="viewDetail">
+    <view wx:for="{{displayRecords}}" wx:key="recordId" class="record-card" data-recordid="{{item.recordId}}" data-date="{{item.date}}" bindtap="viewDetail">
       <view class="card-header">
+        <view class="source-badge source-{{item.source}}">{{item.source === 'huggingface' ? 'HF' : 'Arena'}}</view>
         <text class="card-date">{{item.date}}</text>
         <view class="card-actions">
           <text class="card-count">{{item.totalModels}} 个模型</text>

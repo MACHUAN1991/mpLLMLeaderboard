@@ -3,7 +3,10 @@ Page({
   data: {
     records: [],
     loading: true,
-    empty: true
+    empty: true,
+    currentSource: 'all',  // 筛选来源：all/arena/huggingface
+    filteredCount: 0,
+    displayRecords: []
   },
 
   onLoad: function () {
@@ -34,6 +37,7 @@ Page({
             empty: !res.result.data || res.result.data.length === 0,
             loading: false
           });
+          this.applyFilter();  // 初始化筛选
         } else {
           console.error('获取失败:', res.result.error);
           this.setData({ empty: true, loading: false });
@@ -58,8 +62,23 @@ Page({
 
   // 跳转到管理页
   goToAdmin: function () {
-    wx.navigateTo({
-      url: '/pages/admin/admin'
+    // 先验证密码
+    wx.showModal({
+      title: '管理权限验证',
+      placeholderText: '请输入密码',
+      editable: true,
+      success: (res) => {
+        if (res.confirm && res.content) {
+          if (res.content === 'admin123') {
+            wx.setStorageSync('adminAuthorized', true);
+            wx.navigateTo({
+              url: '/pages/admin/admin'
+            });
+          } else {
+            wx.showToast({ title: '密码错误', icon: 'none' });
+          }
+        }
+      }
     });
   },
 
@@ -98,6 +117,33 @@ Page({
   formatDate: function (timestamp) {
     if (!timestamp) return '';
     const date = new Date(timestamp);
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    return `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
+  },
+
+  // 切换来源筛选
+  switchSource: function (e) {
+    const source = e.currentTarget.dataset.source;
+    this.setData({ currentSource: source });
+    this.applyFilter();
+  },
+
+  // 根据来源筛选记录
+  applyFilter: function () {
+    const { records, currentSource } = this.data;
+    let filtered = records;
+    if (currentSource !== 'all') {
+      filtered = records.filter(item => item.source === currentSource);
+    }
+    this.setData({
+      filteredCount: filtered.length,
+      displayRecords: filtered,
+      empty: filtered.length === 0
+    });
+  },
+
+  getFilteredRecords: function () {
+    const { records, currentSource } = this.data;
+    if (currentSource === 'all') return records;
+    return records.filter(item => item.source === currentSource);
   }
 });

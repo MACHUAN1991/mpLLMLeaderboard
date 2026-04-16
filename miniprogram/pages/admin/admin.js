@@ -5,7 +5,46 @@ Page({
     analyzing: false,
     result: null,
     error: null,
-    analyzingStep: ''
+    analyzingStep: '',
+    source: 'arena'  // 默认 Arena，可选 'arena' 或 'huggingface'
+  },
+
+  onLoad: function () {
+    // 检查是否已授权
+    const isAuthorized = wx.getStorageSync('adminAuthorized');
+    if (!isAuthorized) {
+      this.showLoginDialog();
+    }
+  },
+
+  // 显示登录对话框
+  showLoginDialog: function () {
+    wx.showModal({
+      title: '管理权限验证',
+      placeholderText: '请输入密码',
+      editable: true,
+      success: (res) => {
+        if (res.confirm && res.content) {
+          if (res.content === 'admin123') {  // 密码：admin123
+            wx.setStorageSync('adminAuthorized', true);
+            wx.showToast({ title: '验证成功', icon: 'success' });
+          } else {
+            wx.showToast({ title: '密码错误', icon: 'none' });
+            setTimeout(() => {
+              wx.navigateBack();
+            }, 1500);
+          }
+        } else {
+          wx.navigateBack();
+        }
+      }
+    });
+  },
+
+  // 选择排名来源
+  selectSource: function (e) {
+    const source = e.currentTarget.dataset.source;
+    this.setData({ source });
   },
 
   // 选择图片
@@ -174,12 +213,16 @@ Page({
 
     console.log('saveToHistory rankings 数量:', rankings.length);
 
+    const now = new Date();
+    const defaultDate = `${now.getFullYear()}.${now.getMonth() + 1}.${now.getDate()}`;
+
     return wx.cloud.callFunction({
       name: 'saveRecord',
       data: {
-        date: data.Date || data.date || new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        date: data.Date || data.date || defaultDate,
         rankings: rankings,
-        imageFileId: fileID || ''
+        imageFileId: fileID || '',
+        source: this.data.source
       }
     });
   }

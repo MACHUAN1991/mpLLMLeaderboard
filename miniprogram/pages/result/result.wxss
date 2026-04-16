@@ -12,9 +12,27 @@
 
 .header-top {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 12rpx;
   margin-bottom: 12rpx;
+}
+
+/* 来源标签 */
+.source-badge {
+  font-size: 20rpx;
+  padding: 6rpx 16rpx;
+  border-radius: 10rpx;
+  font-weight: bold;
+}
+
+.source-badge.source-arena {
+  background: rgba(100, 255, 218, 0.2);
+  color: #64ffda;
+}
+
+.source-badge.source-huggingface {
+  background: rgba(255, 165, 0, 0.2);
+  color: #ffa500;
 }
 
 .title {
@@ -170,8 +188,7 @@
   border-radius: 20rpx;
   padding: 16rpx;
   margin-bottom: 24rpx;
-  max-height: 700rpx;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .ranking-item {
