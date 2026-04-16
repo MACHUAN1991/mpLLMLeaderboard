@@ -139,6 +139,7 @@
   padding: 6rpx 16rpx;
   border: 1rpx solid #ff6b6b;
   border-radius: 20rpx;
+  opacity: 0.5;
 }
 
 .top3-preview {

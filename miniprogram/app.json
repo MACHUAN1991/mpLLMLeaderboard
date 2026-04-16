@@ -8,7 +8,9 @@
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#1a1a2e",
     "navigationBarTitleText": "全球AI大模型排名",
-    "navigationBarTextStyle": "white"
+    "navigationBarTextStyle": "white",
+    "enablePullDownRefresh": true,
+    "backgroundColor": "#1a1a2e"
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json"

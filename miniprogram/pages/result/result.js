@@ -19,6 +19,7 @@ Page({
   },
 
   onLoad: function (options) {
+    this.options = options;
     if (options.recordId) {
       // 从云数据库获取完整数据
       this.loadFromRecord(options.recordId, options.date);
@@ -28,6 +29,13 @@ Page({
     }
   },
 
+  onPullDownRefresh: function () {
+    if (this.options.recordId) {
+      this.loadFromRecord(this.options.recordId, this.options.date);
+    }
+    wx.stopPullDownRefresh();
+  },
+
   loadFromRecord: function (recordId, date) {
     wx.showLoading({ title: '加载中...' });
     wx.cloud.callFunction({
@@ -35,6 +43,7 @@ Page({
       data: { recordId },
       success: (res) => {
         wx.hideLoading();
+        wx.stopPullDownRefresh();
         console.log('getRecordDetail 返回:', res.result);
         if (res.result.success) {
           const source = res.result.data.source || 'arena';
@@ -45,6 +54,7 @@ Page({
       },
       fail: (err) => {
         wx.hideLoading();
+        wx.stopPullDownRefresh();
         wx.showToast({ title: '加载失败', icon: 'none' });
         console.error(err);
       }

@@ -6,10 +6,12 @@ Page({
     empty: true,
     currentSource: 'all',  // 筛选来源：all/arena/huggingface/artificial-analysis
     filteredCount: 0,
-    displayRecords: []
+    displayRecords: [],
+    isAdmin: false
   },
 
   onLoad: function () {
+    this.setData({ isAdmin: wx.getStorageSync('adminAuthorized') });
     this.loadHistory();
   },
 
@@ -22,6 +24,7 @@ Page({
   },
 
   onShow: function () {
+    this.setData({ isAdmin: wx.getStorageSync('adminAuthorized') });
     this.loadHistory();
   },
 
@@ -94,30 +97,39 @@ Page({
   deleteRecord: function (e) {
     const { recordid } = e.currentTarget.dataset;
     wx.showModal({
-      title: '确认删除',
-      content: '确定要删除这条记录吗？',
+      title: '删除验证',
+      placeholderText: '请输入管理密码',
+      editable: true,
       success: (res) => {
-        if (res.confirm) {
-          wx.showLoading({ title: '删除中...' });
-          wx.cloud.callFunction({
-            name: 'deleteRecord',
-            data: { recordId: recordid },
-            success: (res) => {
-              wx.hideLoading();
-              if (res.result.success) {
-                wx.showToast({ title: '删除成功', icon: 'success' });
-                this.loadHistory();
-              } else {
-                wx.showToast({ title: '删除失败', icon: 'none' });
-              }
-            },
-            fail: (err) => {
-              wx.hideLoading();
-              wx.showToast({ title: '删除失败', icon: 'none' });
-              console.error(err);
-            }
-          });
+        if (res.confirm && res.content) {
+          if (res.content === 'admin123') {
+            this.doDelete(recordid);
+          } else {
+            wx.showToast({ title: '密码错误', icon: 'none' });
+          }
         }
+      }
+    });
+  },
+
+  doDelete: function (recordid) {
+    wx.showLoading({ title: '删除中...' });
+    wx.cloud.callFunction({
+      name: 'deleteRecord',
+      data: { recordId: recordid },
+      success: (res) => {
+        wx.hideLoading();
+        if (res.result.success) {
+          wx.showToast({ title: '删除成功', icon: 'success' });
+          this.loadHistory();
+        } else {
+          wx.showToast({ title: '删除失败', icon: 'none' });
+        }
+      },
+      fail: (err) => {
+        wx.hideLoading();
+        wx.showToast({ title: '删除失败', icon: 'none' });
+        console.error(err);
       }
     });
   },

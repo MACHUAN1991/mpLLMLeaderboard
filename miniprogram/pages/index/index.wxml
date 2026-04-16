@@ -30,7 +30,7 @@
         <text class="card-date">{{item.date}}</text>
         <view class="card-actions">
           <text class="card-count">{{item.totalModels}} 个模型</text>
-          <text class="delete-btn" data-recordid="{{item.recordId}}" catchtap="deleteRecord">删除</text>
+          <text class="delete-btn" wx:if="{{isAdmin}}" data-recordid="{{item.recordId}}" catchtap="deleteRecord">删除</text>
         </view>
       </view>
 
