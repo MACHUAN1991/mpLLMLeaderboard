@@ -216,7 +216,7 @@
   margin-bottom: 8rpx;
   font-weight: bold;
   color: #64ffda;
-  font-size: 22rpx;
+  font-size: 24rpx;
 }
 
 .ranking-item.header-row .col-rank,
@@ -249,23 +249,14 @@
 }
 
 .rank-badge {
-  width: 72rpx;
-  height: 56rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   border-radius: 12rpx;
-  font-size: 22rpx;
-  font-weight: bold;
   background: rgba(255, 255, 255, 0.05);
-  color: #8892b0;
   margin-right: 12rpx;
 }
 
 .rank-badge.badge-1 {
   background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
   color: #1a1a2e;
-  font-size: 24rpx;
 }
 
 .rank-badge.badge-2 {
@@ -281,25 +272,36 @@
 .col-rank {
   width: 72rpx;
   text-align: center;
-  font-size: 22rpx;
+  font-size: 24rpx;
+  font-weight: 500;
   color: #8892b0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .col-model {
   flex: 1;
   color: #fff;
   font-size: 24rpx;
+  font-weight: 500;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   padding: 0 10rpx;
+  display: flex;
+  align-items: center;
 }
 
 .col-org {
   width: 110rpx;
   text-align: center;
   color: #a8b2d1;
-  font-size: 20rpx;
+  font-size: 24rpx;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .col-score {
@@ -308,6 +310,9 @@
   color: #8892b0;
   font-size: 24rpx;
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .score-gold {

@@ -56,17 +56,17 @@
   <!-- 排名列表 -->
   <view class="ranking-list">
     <view class="ranking-item header-row">
-      <text class="col-rank">排名</text>
-      <text class="col-model">模型</text>
-      <text class="col-org">厂商</text>
-      <text class="col-score">分数</text>
+      <view class="col-rank">排名</view>
+      <view class="col-model">模型</view>
+      <view class="col-org">厂商</view>
+      <view class="col-score">分数</view>
     </view>
 
     <view wx:for="{{filteredRankings}}" wx:key="rank" class="ranking-item {{item.rank <= 3 ? 'top-' + item.rank : ''}}">
-      <view class="rank-badge {{item.rank <= 3 ? 'badge-' + item.rank : ''}}">#{{item.rank}}</view>
-      <text class="col-model">{{item.modelName}}</text>
-      <text class="col-org">{{item.organization}}</text>
-      <text class="col-score {{item.rank <= 3 ? 'score-gold' : ''}}">{{item.score}}</text>
+      <view class="col-rank rank-badge {{item.rank <= 3 ? 'badge-' + item.rank : ''}}">#{{item.rank}}</view>
+      <view class="col-model">{{item.modelName}}</view>
+      <view class="col-org">{{item.organization}}</view>
+      <view class="col-score {{item.rank <= 3 ? 'score-gold' : ''}}">{{item.score}}</view>
     </view>
 
     <view wx:if="{{filteredRankings.length === 0}}" class="empty-filter">

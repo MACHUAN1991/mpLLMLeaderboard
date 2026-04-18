@@ -6,7 +6,7 @@
       <view class="source-tab {{currentSource === 'huggingface' ? 'active' : ''}}" data-source="huggingface" bindtap="switchSource">Hugging Face</view>
       <view class="source-tab {{currentSource === 'artificial-analysis' ? 'active' : ''}}" data-source="artificial-analysis" bindtap="switchSource">Artificial Analysis</view>
     </view>
-    <text class="admin-link" bindtap="goToAdmin">管理</text>
+    <text class="admin-link" wx:if="{{isAdmin}}" bindtap="goToAdmin">管理</text>
   </view>
   <view class="source-desc" wx:if="{{currentSource === 'all'}}">定期更新各大权威网站AI大模型排名，只对排名前15的模型进行统计</view>
   <view class="source-desc" wx:elif="{{currentSource === 'arena'}}">LLM盲测对战平台，用户匿名投票选出哪个模型回答更好，是目前最权威的大模型真实体验排名网站</view>
