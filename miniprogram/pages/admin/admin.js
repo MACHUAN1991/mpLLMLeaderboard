@@ -94,12 +94,10 @@ Page({
         console.log('原图大小:', fileSize);
         if (fileSize > 100 * 1024) {
           this.setData({ analyzingStep: '压缩图片...' });
-          wx.showLoading({ title: '压缩中...' });
           const compressResult = await wx.compressImage({
             src: this.data.imagePath,
             quality: 50
           });
-          wx.hideLoading();
           if (compressResult.tempFilePath) {
             filePath = compressResult.tempFilePath;
             const newSize = await this.getFileSize(filePath);
@@ -111,8 +109,7 @@ Page({
       }
 
       // 2. 上传图片
-      this.setData({ analyzingStep: '上传图片...' });
-      wx.showLoading({ title: '上传中...' });
+      this.setData({ analyzingStep: '上传中...' });
       const uploadResult = await wx.cloud.uploadFile({
         cloudPath: `arena/${Date.now()}.jpg`,
         filePath: filePath
@@ -121,8 +118,7 @@ Page({
       wx.hideLoading();
 
       // 3. 调用云函数分析（显示进度）
-      this.setData({ analyzingStep: 'AI 解析中（请等待）...' });
-      wx.showLoading({ title: 'AI 解析中...' });
+      this.setData({ analyzingStep: '解析中...' });
 
       const analyzeResult = await wx.cloud.callFunction({
         name: 'analyzeImage',
@@ -185,6 +181,14 @@ Page({
       wx.showToast({ title: errorMsg, icon: 'none' });
       console.error(err);
     }
+  },
+
+  // 退出管理
+  logout: function () {
+    wx.removeStorageSync('adminAuthorized');
+    wx.reLaunch({
+      url: '/pages/index/index'
+    });
   },
 
   // 清除结果

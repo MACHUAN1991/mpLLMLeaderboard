@@ -1,7 +1,9 @@
 <view class="container">
   <view class="header">
-    <text class="title">AI 排名管理</text>
-    <text class="subtitle">上传截图进行 AI 解析</text>
+    <text class="title">排名管理</text>
+    <view class="header-actions">
+      <text class="logout-btn" bindtap="logout">退出管理</text>
+    </view>
   </view>
 
   <view class="source-selector">

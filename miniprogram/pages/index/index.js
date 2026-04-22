@@ -7,7 +7,8 @@ Page({
     currentSource: 'all',  // 筛选来源：all/arena/huggingface/artificial-analysis
     filteredCount: 0,
     displayRecords: [],
-    isAdmin: false
+    isAdmin: false,
+    adminTapCount: 0  // 连续点击计数
   },
 
   onLoad: function () {
@@ -71,42 +72,44 @@ Page({
     });
   },
 
-  // 跳转到管理页
-  goToAdmin: function () {
-    // 先验证密码
-    wx.showModal({
-      title: '管理权限验证',
-      placeholderText: '请输入密码',
-      editable: true,
-      success: (res) => {
-        if (res.confirm && res.content) {
-          if (res.content === 'admin123') {
-            wx.setStorageSync('adminAuthorized', true);
-            wx.navigateTo({
-              url: '/pages/admin/admin'
-            });
-          } else {
-            wx.showToast({ title: '密码错误', icon: 'none' });
+  // 连续点击触发管理入口
+  onSecretTap: function () {
+    let count = this.data.adminTapCount + 1;
+    this.setData({ adminTapCount: count });
+
+    // 连续点击5次弹出密码验证
+    if (count >= 5) {
+      this.setData({ adminTapCount: 0 });
+      wx.showModal({
+        title: '管理权限验证',
+        placeholderText: '请输入密码',
+        editable: true,
+        success: (res) => {
+          if (res.confirm && res.content) {
+            if (res.content === 'admin123') {
+              wx.setStorageSync('adminAuthorized', true);
+              this.setData({ isAdmin: true });
+              wx.navigateTo({
+                url: '/pages/admin/admin'
+              });
+            } else {
+              wx.showToast({ title: '密码错误', icon: 'none' });
+            }
           }
         }
-      }
-    });
+      });
+    }
   },
 
   // 删除记录
   deleteRecord: function (e) {
     const { recordid } = e.currentTarget.dataset;
     wx.showModal({
-      title: '删除验证',
-      placeholderText: '请输入管理密码',
-      editable: true,
+      title: '确认删除',
+      content: '确定要删除这条记录吗？',
       success: (res) => {
-        if (res.confirm && res.content) {
-          if (res.content === 'admin123') {
-            this.doDelete(recordid);
-          } else {
-            wx.showToast({ title: '密码错误', icon: 'none' });
-          }
+        if (res.confirm) {
+          this.doDelete(recordid);
         }
       }
     });
