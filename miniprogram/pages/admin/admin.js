@@ -122,7 +122,7 @@ Page({
 
       const analyzeResult = await wx.cloud.callFunction({
         name: 'analyzeImage',
-        data: { fileID },
+        data: { fileID, source: this.data.source },
         timeout: 120000  // 120秒超时，云函数内部限制
       });
 

@@ -102,7 +102,9 @@ Page({
       rank: item.Rank || item.rank || 0,
       modelName: item['Model Name'] || item.model_name || item.modelName || '',
       organization: item.Organization || item.organization || '',
-      score: item.Score || item.score || 0
+      score: item.Score || item.score || 0,
+      price: item.Price || item.price || null,
+      speed: item.Speed || item.speed || null
     }));
 
     console.log('normalizedRankings:', normalizedRankings);

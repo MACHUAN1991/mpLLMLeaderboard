@@ -31,7 +31,9 @@ exports.main = async (event, context) => {
       rank: item.rank || item.Rank || 0,
       modelName: item.model_name || item['Model Name'] || '',
       organization: item.organization || item.Organization || '',
-      score: item.score || item.Score || 0
+      score: item.score || item.Score || 0,
+      price: item.price || item.Price || null,
+      speed: item.speed || item.Speed || null
     }));
 
     // 写入主记录
@@ -57,7 +59,9 @@ exports.main = async (event, context) => {
           rank: item.rank || item.Rank || 0,
           modelName: item.modelName || item.model_name || item['Model Name'] || '',
           organization: item.organization || item.Organization || '',
-          score: item.score || item.Score || 0
+          score: item.score || item.Score || 0,
+          price: item.price || item.Price || null,
+          speed: item.speed || item.Speed || null
         }))
       }
     });

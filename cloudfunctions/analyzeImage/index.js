@@ -42,22 +42,39 @@ async function downloadImageAsBase64(url) {
 }
 
 /**
+ * 根据来源构建不同的解析提示词
+ */
+function buildPrompt(source) {
+  const baseFields = `1. 排名（Rank）
+2. 模型名称（Model Name）
+3. 模型厂商/组织（Organization）
+4. 分数（Score）
+5. 该截图的发布日期（Date）`;
 
+  if (source === 'artificial-analysis') {
+    return `请解析这张Artificial Analysis大模型排名截图，提取以下信息并以JSON格式返回：
+${baseFields}
+6. 价格（Price）- 模型的使用价格/成本，格式为原始文本（如"$0.50/M tokens"、"免费"等），如果无法提取请返回null
+7. 速度（Speed）- 模型的响应速度/tokens per second，格式为原始文本（如"150 tok/s"），如果无法提取请返回null
+如果某个字段无法提取，请返回null。请只返回JSON，不要包含其他文字。`;
+  }
+
+  const sourceName = source === 'huggingface' ? 'HuggingFace' : 'Arena';
+  return `请解析这张${sourceName}大模型排名截图，提取以下信息并以JSON格式返回：
+${baseFields}
+如果某个字段无法提取，请返回null。请只返回JSON，不要包含其他文字。`;
+}
+
+/**
  * 调用 MiniMax 视觉理解 API
  */
-async function analyzeWithBase64(base64Image) {
+async function analyzeWithBase64(base64Image, source) {
   try {
     console.log('调用 MiniMax API...');
     const response = await axios.post(
       MINIMAX_API_URL,
       {
-        prompt: `请解析这张Arena大模型排名截图，提取以下信息并以JSON格式返回：
-1. 排名（Rank）
-2. 模型名称（Model Name）
-3. 模型厂商/组织（Organization）
-4. 分数（Score）
-5. 该截图的发布日期（Date）
-如果某个字段无法提取，请返回null。请只返回JSON，不要包含其他文字。`,
+        prompt: buildPrompt(source),
         image_url: base64Image
       },
       {
@@ -80,18 +97,12 @@ async function analyzeWithBase64(base64Image) {
 /**
  * 方式2: 直接使用图片 URL
  */
-async function analyzeWithUrl(imageUrl) {
+async function analyzeWithUrl(imageUrl, source) {
   try {
     const response = await axios.post(
       MINIMAX_API_URL,
       {
-        prompt: `请解析这张Arena大模型排名截图，提取以下信息并以JSON格式返回：
-1. 排名（Rank）
-2. 模型名称（Model Name）
-3. 模型厂商/组织（Organization）
-4. 分数（Score）
-5. 该截图的发布日期（Date）
-如果某个字段无法提取，请返回null。请只返回JSON，不要包含其他文字。`,
+        prompt: buildPrompt(source),
         image_url: imageUrl
       },
       {
@@ -154,7 +165,7 @@ function parseAIResponse(content) {
  * 云函数入口
  */
 exports.main = async (event, context) => {
-  const { fileID } = event;
+  const { fileID, source } = event;
 
   if (!fileID) {
     return { success: false, error: '缺少图片文件ID' };
@@ -179,7 +190,7 @@ exports.main = async (event, context) => {
 
     // 3. 调用 MiniMax API 分析图片
     console.log('正在调用 MiniMax AI 分析...');
-    const aiResult = await analyzeWithBase64(base64Image);
+    const aiResult = await analyzeWithBase64(base64Image, source);
     console.log('AI 返回结果:', JSON.stringify(aiResult).substring(0, 500));
 
     // 4. 解析 AI 返回结果
