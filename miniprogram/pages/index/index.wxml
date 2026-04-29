@@ -1,17 +1,29 @@
 <view class="container">
   <view class="header-row">
     <view class="source-tabs">
-      <view class="source-tab {{currentSource === 'artificial-analysis' ? 'active' : ''}}" data-source="artificial-analysis" bindtap="switchSource">Artificial Analysis</view>
-      <view class="source-tab {{currentSource === 'arena' ? 'active' : ''}}" data-source="arena" bindtap="switchSource">Arena</view>
-      <view class="source-tab {{currentSource === 'huggingface' ? 'active' : ''}}" data-source="huggingface" bindtap="switchSource">Hugging Face</view>
+      <view class="source-tab {{currentSource === 'artificial-analysis' ? 'active active-aa' : ''}}" data-source="artificial-analysis" bindtap="switchSource">Artificial Analysis</view>
+      <view class="source-tab {{currentSource === 'arena' ? 'active active-arena' : ''}}" data-source="arena" bindtap="switchSource">Arena</view>
+      <view class="source-tab {{currentSource === 'huggingface' ? 'active active-hf' : ''}}" data-source="huggingface" bindtap="switchSource">Hugging Face</view>
     </view>
   </view>
   <view class="source-desc" wx:if="{{currentSource === 'artificial-analysis'}}">
     <text>面向实际选型需求，按照智力进行排名，提供价格、速度、上下文长度等多维度信息</text>
-    <text class="trend-link" bindtap="goTrend">查看趋势 →</text>
   </view>
-  <view class="source-desc" wx:elif="{{currentSource === 'arena'}}">盲测对战平台，用户匿名提出问题，两个模型给出回答，用户匿名投票选出哪个模型回答更好，综合得分进行排名</view>
-  <view class="source-desc" wx:elif="{{currentSource === 'huggingface'}}">开源模型SWE-Bench Pro榜单，基于企业级软件工程任务，评估各模型在真实复杂编程任务中的实战能力，进行得分排名</view>
+  <view class="trend-btn-row" wx:if="{{currentSource === 'artificial-analysis'}}">
+    <text class="trend-link trend-aa" bindtap="goTrend" data-source="artificial-analysis">查看排名变化趋势</text>
+  </view>
+  <view class="source-desc" wx:if="{{currentSource === 'arena'}}">
+    <text>盲测对战平台，用户匿名提出问题，两个模型给出回答，用户匿名投票选出哪个模型回答更好，综合得分进行排名</text>
+  </view>
+  <view class="trend-btn-row" wx:if="{{currentSource === 'arena'}}">
+    <text class="trend-link trend-arena" bindtap="goTrend" data-source="arena">查看排名变化趋势</text>
+  </view>
+  <view class="source-desc" wx:if="{{currentSource === 'huggingface'}}">
+    <text>开源模型SWE-Bench Pro榜单，基于企业级软件工程任务，评估各模型在真实复杂编程任务中的实战能力，进行得分排名</text>
+  </view>
+  <view class="trend-btn-row" wx:if="{{currentSource === 'huggingface'}}">
+    <text class="trend-link trend-hf" bindtap="goTrend" data-source="huggingface">查看排名变化趋势</text>
+  </view>
 
   <view wx:if="{{loading}}" class="loading">
     <text>加载中...</text>
@@ -42,7 +54,7 @@
 
       <view class="card-footer">
         <text class="card-time">{{formatDate(item.timestamp)}}</text>
-        <text class="view-more">点击查看 →</text>
+        <text class="view-more">查看完整排名 -></text>
       </view>
     </view>
   </view>

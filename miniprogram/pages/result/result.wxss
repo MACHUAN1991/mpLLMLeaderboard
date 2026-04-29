@@ -26,18 +26,18 @@
 }
 
 .source-badge.source-arena {
-  background: rgba(100, 255, 218, 0.2);
-  color: #64ffda;
+  background: rgba(201, 169, 110, 0.2);
+  color: #c9a96e;
 }
 
 .source-badge.source-huggingface {
-  background: rgba(255, 165, 0, 0.2);
-  color: #ffa500;
+  background: rgba(127, 179, 211, 0.2);
+  color: #7fb3d3;
 }
 
 .source-badge.source-artificial-analysis {
-  background: rgba(138, 43, 226, 0.2);
-  color: #9370db;
+  background: rgba(149, 117, 205, 0.2);
+  color: #9575cd;
 }
 
 .title {
@@ -307,23 +307,26 @@
 
 .col-model-extra {
   display: flex;
-  gap: 16rpx;
+  gap: 20rpx;
   margin-top: 4rpx;
 }
 
 .extra-price {
   font-size: 20rpx;
   color: #a8b2d1;
+  width: 140rpx;
 }
 
 .extra-speed {
   font-size: 20rpx;
   color: #a8b2d1;
+  width: 100rpx;
 }
 
 .extra-context {
   font-size: 20rpx;
   color: #a8b2d1;
+  width: 120rpx;
 }
 
 .col-org {

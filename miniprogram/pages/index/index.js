@@ -129,9 +129,10 @@ Page({
     return records.filter(item => item.source === currentSource);
   },
 
-  goTrend: function () {
+  goTrend: function (e) {
+    const source = e.currentTarget.dataset.source || 'artificial-analysis';
     wx.navigateTo({
-      url: '/pages/trend/trend'
+      url: `/pages/trend/trend?source=${source}`
     });
   }
 });

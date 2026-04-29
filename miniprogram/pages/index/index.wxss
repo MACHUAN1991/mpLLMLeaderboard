@@ -96,19 +96,19 @@
   font-weight: bold;
 }
 
+.source-badge.source-artificial-analysis {
+  background: rgba(149, 117, 205, 0.2);
+  color: #9575cd;
+}
+
 .source-badge.source-arena {
-  background: rgba(100, 255, 218, 0.2);
-  color: #64ffda;
+  background: rgba(201, 169, 110, 0.2);
+  color: #c9a96e;
 }
 
 .source-badge.source-huggingface {
-  background: rgba(255, 165, 0, 0.2);
-  color: #ffa500;
-}
-
-.source-badge.source-artificial-analysis {
-  background: rgba(138, 43, 226, 0.2);
-  color: #9370db;
+  background: rgba(127, 179, 211, 0.2);
+  color: #7fb3d3;
 }
 
 .card-date {
@@ -233,27 +233,59 @@
 
 .source-tab.active {
   color: #1a1a2e;
-  background: #64ffda;
-  border-color: #64ffda;
+  font-weight: bold;
+}
+
+.active-aa {
+  background: #9575cd;
+  border-color: #9575cd;
+}
+
+.active-arena {
+  background: #c9a96e;
+  border-color: #c9a96e;
+}
+
+.active-hf {
+  background: #7fb3d3;
+  border-color: #7fb3d3;
 }
 
 .source-desc {
   text-align: left;
   font-size: 24rpx;
   color: #8892b0;
-  margin-bottom: 30rpx;
+  margin-bottom: 16rpx;
+}
+
+.trend-btn-row {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
+  margin-bottom: 30rpx;
 }
 
 .trend-link {
-  color: #9370db;
   font-size: 24rpx;
   padding: 8rpx 16rpx;
-  background: rgba(147, 112, 219, 0.1);
   border-radius: 20rpx;
-  border: 1rpx solid rgba(147, 112, 219, 0.3);
+}
+
+.trend-aa {
+  color: #9575cd;
+  background: rgba(149, 117, 205, 0.1);
+  border: 1rpx solid rgba(149, 117, 205, 0.3);
+}
+
+.trend-arena {
+  color: #c9a96e;
+  background: rgba(201, 169, 110, 0.1);
+  border: 1rpx solid rgba(201, 169, 110, 0.3);
+}
+
+.trend-hf {
+  color: #7fb3d3;
+  background: rgba(127, 179, 211, 0.1);
+  border: 1rpx solid rgba(127, 179, 211, 0.3);
 }
 
 /* 隐藏的管理入口触发区域 */

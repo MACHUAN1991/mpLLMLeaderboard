@@ -1,7 +1,9 @@
 <view class="container">
   <view class="header">
     <text class="title">排名趋势</text>
-    <text class="subtitle">Artificial Analysis 近14天排名变化</text>
+    <text class="subtitle subtitle-{{source}}" wx:if="{{source === 'artificial-analysis'}}">Artificial Analysis 近14天排名变化</text>
+    <text class="subtitle subtitle-{{source}}" wx:elif="{{source === 'arena'}}">Arena 近14天排名变化</text>
+    <text class="subtitle subtitle-{{source}}" wx:elif="{{source === 'huggingface'}}">Hugging Face 近14天排名变化</text>
   </view>
 
   <view wx:if="{{loading}}" class="loading">
@@ -22,6 +24,14 @@
         <text class="section-hint">近14天数据</text>
       </view>
       <canvas id="trendCanvas" type="2d" class="trend-canvas" style="height: {{chartHeight}}px;"></canvas>
+
+      <!-- 图例 -->
+      <view class="legend-container">
+        <view wx:for="{{tableData}}" wx:key="name" class="legend-item">
+          <view class="legend-color" style="background-color: {{colors[item.index % colors.length]}};"></view>
+          <text class="legend-text">{{item.name}}</text>
+        </view>
+      </view>
     </view>
 
     <!-- 排名变化详情 -->

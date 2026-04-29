@@ -24,6 +24,18 @@
   color: #8892b0;
 }
 
+.subtitle-artificial-analysis {
+  color: #9575cd;
+}
+
+.subtitle-arena {
+  color: #c9a96e;
+}
+
+.subtitle-huggingface {
+  color: #7fb3d3;
+}
+
 .loading, .empty-state {
   display: flex;
   flex-direction: column;
@@ -64,7 +76,7 @@
 .section-title {
   display: block;
   font-size: 28rpx;
-  color: #64ffda;
+  color: #8892b0;
   font-weight: bold;
 }
 
@@ -84,6 +96,36 @@
   width: 100%;
   border-radius: 12rpx;
   background: rgba(0, 0, 0, 0.2);
+}
+
+/* 图例容器 */
+.legend-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  margin-top: 16rpx;
+  padding: 12rpx;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 12rpx;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.legend-color {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 4rpx;
+  flex-shrink: 0;
+}
+
+.legend-text {
+  font-size: 20rpx;
+  color: #8892b0;
+  white-space: nowrap;
 }
 
 /* 表格区域 */
