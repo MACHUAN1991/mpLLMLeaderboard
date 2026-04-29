@@ -1,0 +1,266 @@
+/* pages/trend/trend.wxss */
+.container {
+  min-height: 100vh;
+  padding: 30rpx;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  box-sizing: border-box;
+}
+
+.header {
+  margin-bottom: 30rpx;
+}
+
+.title {
+  display: block;
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 8rpx;
+}
+
+.subtitle {
+  display: block;
+  font-size: 24rpx;
+  color: #8892b0;
+}
+
+.loading, .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 0;
+}
+
+.loading text {
+  color: #8892b0;
+  font-size: 28rpx;
+}
+
+.empty-icon {
+  font-size: 80rpx;
+  margin-bottom: 20rpx;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #8892b0;
+  margin-bottom: 10rpx;
+}
+
+.empty-hint {
+  font-size: 22rpx;
+  color: #5a6380;
+}
+
+/* 折线图区域 */
+.chart-section {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 20rpx;
+  padding: 24rpx;
+  margin-bottom: 30rpx;
+}
+
+.section-title {
+  display: block;
+  font-size: 28rpx;
+  color: #64ffda;
+  font-weight: bold;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.section-hint {
+  font-size: 20rpx;
+  color: #8892b0;
+}
+
+.trend-canvas {
+  width: 100%;
+  border-radius: 12rpx;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* 表格区域 */
+.table-section {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 20rpx;
+  padding: 24rpx;
+  margin-bottom: 30rpx;
+}
+
+/* 模型卡片 */
+.model-card {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 16rpx;
+  padding: 20rpx;
+  margin-bottom: 16rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.05);
+}
+
+.model-card:last-child {
+  margin-bottom: 0;
+}
+
+.model-header {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.model-rank-badge {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 12rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22rpx;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.rank-badge-1 {
+  background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+  color: #1a1a2e;
+}
+
+.rank-badge-2 {
+  background: linear-gradient(135deg, #c0c0c0 0%, #a0a0a0 100%);
+  color: #1a1a2e;
+}
+
+.rank-badge-3 {
+  background: linear-gradient(135deg, #cd7f32 0%, #a05a20 100%);
+  color: #fff;
+}
+
+.rank-badge-normal {
+  background: rgba(100, 255, 218, 0.1);
+  color: #64ffda;
+  border: 1rpx solid rgba(100, 255, 218, 0.3);
+}
+
+.model-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.model-name {
+  display: block;
+  font-size: 26rpx;
+  color: #fff;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.model-org {
+  display: block;
+  font-size: 20rpx;
+  color: #8892b0;
+  margin-top: 4rpx;
+}
+
+.change-badge {
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  font-weight: bold;
+}
+
+.change-badge.rise {
+  background: rgba(100, 255, 218, 0.15);
+  color: #64ffda;
+  border: 1rpx solid rgba(100, 255, 218, 0.3);
+}
+
+.change-badge.fall {
+  background: rgba(255, 107, 107, 0.15);
+  color: #ff6b6b;
+  border: 1rpx solid rgba(255, 107, 107, 0.3);
+}
+
+.change-badge.same {
+  background: rgba(136, 146, 176, 0.15);
+  color: #8892b0;
+  border: 1rpx solid rgba(136, 146, 176, 0.3);
+}
+
+/* 时间线 */
+.rank-timeline {
+  display: flex;
+  gap: 12rpx;
+  overflow-x: auto;
+  padding: 8rpx 0;
+}
+
+.rank-timeline::-webkit-scrollbar {
+  display: none;
+}
+
+.timeline-point {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 80rpx;
+}
+
+.point-rank {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22rpx;
+  font-weight: bold;
+  margin-bottom: 8rpx;
+}
+
+.point-rank.rank-1 {
+  background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+  color: #1a1a2e;
+}
+
+.point-rank.rank-2 {
+  background: linear-gradient(135deg, #c0c0c0 0%, #a0a0a0 100%);
+  color: #1a1a2e;
+}
+
+.point-rank.rank-3 {
+  background: linear-gradient(135deg, #cd7f32 0%, #a05a20 100%);
+  color: #fff;
+}
+
+.point-rank.rank-normal {
+  background: rgba(100, 255, 218, 0.1);
+  color: #64ffda;
+  border: 1rpx solid rgba(100, 255, 218, 0.3);
+}
+
+.point-date {
+  font-size: 18rpx;
+  color: #8892b0;
+}
+
+.point-score {
+  font-size: 16rpx;
+  color: #64ffda;
+  margin-top: 4rpx;
+}
+
+.btn-back {
+  background: transparent;
+  border: 2rpx solid #64ffda;
+  color: #64ffda;
+  border-radius: 12rpx;
+  padding: 24rpx;
+  font-size: 28rpx;
+}

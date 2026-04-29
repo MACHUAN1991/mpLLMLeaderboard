@@ -83,7 +83,7 @@ Page({
   processRankings: function (data, date, source) {
     console.log('processRankings 收到的数据:', data);
 
-    // 兼容两种格式：大写 Ranking / 小写 rankings / Rankings
+    // 兼容多种格式：Ranking / rankings / Rankings / Models
     let rankings = [];
     if (Array.isArray(data.Ranking)) {
       rankings = data.Ranking;
@@ -91,6 +91,8 @@ Page({
       rankings = data.rankings;
     } else if (Array.isArray(data.Rankings)) {
       rankings = data.Rankings;
+    } else if (Array.isArray(data.Models)) {
+      rankings = data.Models;
     } else if (Array.isArray(data)) {
       rankings = data;
     }
@@ -104,7 +106,8 @@ Page({
       organization: item.Organization || item.organization || '',
       score: item.Score || item.score || 0,
       price: item.Price || item.price || null,
-      speed: item.Speed || item.speed || null
+      speed: item.Speed || item.speed || null,
+      contextLength: item['Context Window / Context Length'] || item['Context Window'] || item['Context Length'] || item.contextLength || null
     }));
 
     console.log('normalizedRankings:', normalizedRankings);

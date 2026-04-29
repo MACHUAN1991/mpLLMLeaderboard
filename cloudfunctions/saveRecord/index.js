@@ -33,7 +33,8 @@ exports.main = async (event, context) => {
       organization: item.organization || item.Organization || '',
       score: item.score || item.Score || 0,
       price: item.price || item.Price || null,
-      speed: item.speed || item.Speed || null
+      speed: item.speed || item.Speed || null,
+      contextLength: item.contextLength || item['Context Window / Context Length'] || item['Context Window'] || item['Context Length'] || null
     }));
 
     // 写入主记录
@@ -61,7 +62,8 @@ exports.main = async (event, context) => {
           organization: item.organization || item.Organization || '',
           score: item.score || item.Score || 0,
           price: item.price || item.Price || null,
-          speed: item.speed || item.Speed || null
+          speed: item.speed || item.Speed || null,
+          contextLength: item.contextLength || item['Context Window / Context Length'] || item['Context Window'] || item['Context Length'] || null
         }))
       }
     });

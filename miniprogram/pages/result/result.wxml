@@ -57,7 +57,7 @@
   <view class="ranking-list">
     <view class="ranking-item header-row">
       <view class="col-rank">排名</view>
-      <view class="col-model">{{source === 'artificial-analysis' ? '模型（价格 / 速度）' : '模型'}}</view>
+      <view class="col-model">{{source === 'artificial-analysis' ? '模型（价格 / 速度 / 上下文）' : '模型'}}</view>
       <view class="col-org">厂商</view>
       <view class="col-score">{{source === 'artificial-analysis' ? '智力' : '分数'}}</view>
     </view>
@@ -69,6 +69,7 @@
         <view wx:if="{{source === 'artificial-analysis'}}" class="col-model-extra">
           <text class="extra-price">{{item.price || '-'}}</text>
           <text class="extra-speed">{{item.speed || '-'}}</text>
+          <text class="extra-context">{{item.contextLength || '-'}}</text>
         </view>
       </view>
       <view class="col-org">{{item.organization}}</view>

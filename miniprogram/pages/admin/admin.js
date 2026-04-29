@@ -6,15 +6,19 @@ Page({
     result: null,
     error: null,
     analyzingStep: '',
-    source: 'arena'  // 默认 Arena，可选 'arena' 或 'huggingface'
+    source: 'artificial-analysis',
+    records: [],
+    loadingRecords: false
   },
 
   onLoad: function () {
-    // 检查是否已授权
-    const isAuthorized = wx.getStorageSync('adminAuthorized');
-    if (!isAuthorized) {
-      this.showLoginDialog();
-    }
+    // 导航到管理页前已在首页验证密码，此处直接加载记录
+    this.loadRecords();
+  },
+
+  onUnload: function () {
+    // 离开管理页时清除管理员状态，避免删除按钮一直显示
+    wx.removeStorageSync('adminAuthorized');
   },
 
   // 显示登录对话框
@@ -28,6 +32,7 @@ Page({
           if (res.content === 'admin123') {  // 密码：admin123
             wx.setStorageSync('adminAuthorized', true);
             wx.showToast({ title: '验证成功', icon: 'success' });
+            this.loadRecords();
           } else {
             wx.showToast({ title: '密码错误', icon: 'none' });
             setTimeout(() => {
@@ -36,6 +41,59 @@ Page({
           }
         } else {
           wx.navigateBack();
+        }
+      }
+    });
+  },
+
+  // 加载记录列表
+  loadRecords: function () {
+    this.setData({ loadingRecords: true });
+    wx.cloud.callFunction({
+      name: 'getHistory',
+      data: { page: 1, pageSize: 50 },
+      success: (res) => {
+        if (res.result.success) {
+          this.setData({
+            records: res.result.data || [],
+            loadingRecords: false
+          });
+        } else {
+          this.setData({ loadingRecords: false });
+        }
+      },
+      fail: () => {
+        this.setData({ loadingRecords: false });
+      }
+    });
+  },
+
+  // 删除记录
+  deleteRecord: function (e) {
+    const { recordid, date } = e.currentTarget.dataset;
+    wx.showModal({
+      title: '确认删除',
+      content: `确定要删除 ${date || '这条记录'} 吗？`,
+      success: (res) => {
+        if (res.confirm) {
+          wx.showLoading({ title: '删除中...' });
+          wx.cloud.callFunction({
+            name: 'deleteRecord',
+            data: { recordId: recordid },
+            success: (res) => {
+              wx.hideLoading();
+              if (res.result.success) {
+                wx.showToast({ title: '删除成功', icon: 'success' });
+                this.loadRecords();
+              } else {
+                wx.showToast({ title: '删除失败', icon: 'none' });
+              }
+            },
+            fail: () => {
+              wx.hideLoading();
+              wx.showToast({ title: '删除失败', icon: 'none' });
+            }
+          });
         }
       }
     });
@@ -181,14 +239,6 @@ Page({
       wx.showToast({ title: errorMsg, icon: 'none' });
       console.error(err);
     }
-  },
-
-  // 退出管理
-  logout: function () {
-    wx.removeStorageSync('adminAuthorized');
-    wx.reLaunch({
-      url: '/pages/index/index'
-    });
   },
 
   // 清除结果

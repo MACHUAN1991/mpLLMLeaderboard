@@ -1,17 +1,14 @@
 <view class="container">
   <view class="header">
-    <text class="title">排名管理</text>
-    <view class="header-actions">
-      <text class="logout-btn" bindtap="logout">退出管理</text>
-    </view>
+    <text class="title">管理员页面</text>
   </view>
 
   <view class="source-selector">
     <text class="selector-label">选择排名来源：</text>
     <view class="source-tabs">
+      <view class="source-tab {{source === 'artificial-analysis' ? 'active' : ''}}" data-source="artificial-analysis" bindtap="selectSource">Artificial Analysis</view>
       <view class="source-tab {{source === 'arena' ? 'active' : ''}}" data-source="arena" bindtap="selectSource">Arena</view>
       <view class="source-tab {{source === 'huggingface' ? 'active' : ''}}" data-source="huggingface" bindtap="selectSource">Hugging Face</view>
-      <view class="source-tab {{source === 'artificial-analysis' ? 'active' : ''}}" data-source="artificial-analysis" bindtap="selectSource">Artificial Analysis</view>
     </view>
   </view>
 
@@ -48,12 +45,21 @@
     <text>{{error}}</text>
   </view>
 
-  <view class="tips">
-    <text class="tips-title">操作说明</text>
-    <text class="tips-item">1. 选择排名来源（Arena / Hugging Face / Artificial Analysis）</text>
-    <text class="tips-item">2. 点击上方区域选择截图</text>
-    <text class="tips-item">3. 点击「开始解析」</text>
-    <text class="tips-item">4. 解析结果自动保存到数据库</text>
-    <text class="tips-item">5. 用户可在首页查看历史记录</text>
+  <!-- 记录列表 -->
+  <view class="records-section">
+    <view class="section-title">历史记录</view>
+    <view wx:if="{{loadingRecords}}" class="loading-text">加载中...</view>
+    <view wx:elif="{{records.length === 0}}" class="empty-text">暂无记录</view>
+    <view wx:else class="record-list">
+      <view wx:for="{{records}}" wx:key="recordId" class="record-item">
+        <view class="record-info">
+          <view class="record-source source-{{item.source}}">{{item.source === 'huggingface' ? 'HF' : item.source === 'artificial-analysis' ? 'AA' : 'Arena'}}</view>
+          <text class="record-date">{{item.date}}</text>
+          <text class="record-count">{{item.totalModels}} 个模型</text>
+        </view>
+        <text class="delete-btn" data-recordid="{{item.recordId}}" data-date="{{item.date}}" catchtap="deleteRecord">删除</text>
+      </view>
+    </view>
   </view>
+
 </view>

@@ -56,6 +56,7 @@ function buildPrompt(source) {
 ${baseFields}
 6. 价格（Price）- 模型的使用价格/成本，格式为原始文本（如"$0.50/M tokens"、"免费"等），如果无法提取请返回null
 7. 速度（Speed）- 模型的响应速度/tokens per second，格式为原始文本（如"150 tok/s"），如果无法提取请返回null
+8. 上下文长度（Context Window / Context Length）- 模型的上下文窗口长度，格式为原始文本（如"128K"、"200K"、"无限"等），截图中可能显示为 "Context Window" 或 "Context Length"，如果无法提取请返回null
 如果某个字段无法提取，请返回null。请只返回JSON，不要包含其他文字。`;
   }
 
@@ -216,6 +217,12 @@ exports.main = async (event, context) => {
     } else if (parsedResult?.Ranking) {
       // 对象格式：{Ranking: [...], Date: ...}
       normalizedData = parsedResult;
+    } else if (parsedResult?.Models) {
+      // 对象格式：{Models: [...], Date: ...} — AI 有时返回 Models 而非 Ranking
+      normalizedData = {
+        Ranking: parsedResult.Models,
+        Date: parsedResult.Date || ''
+      };
     } else {
       // 其他格式
       normalizedData = parsedResult;

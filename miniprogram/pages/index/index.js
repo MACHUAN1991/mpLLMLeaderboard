@@ -4,15 +4,13 @@ Page({
     records: [],
     loading: true,
     empty: true,
-    currentSource: 'all',  // 筛选来源：all/arena/huggingface/artificial-analysis
+    currentSource: 'artificial-analysis',
     filteredCount: 0,
     displayRecords: [],
-    isAdmin: false,
-    adminTapCount: 0  // 连续点击计数
+    adminTapCount: 0
   },
 
   onLoad: function () {
-    this.setData({ isAdmin: wx.getStorageSync('adminAuthorized') });
     this.loadHistory();
   },
 
@@ -25,7 +23,6 @@ Page({
   },
 
   onShow: function () {
-    this.setData({ isAdmin: wx.getStorageSync('adminAuthorized') });
     this.loadHistory();
   },
 
@@ -87,8 +84,6 @@ Page({
         success: (res) => {
           if (res.confirm && res.content) {
             if (res.content === 'admin123') {
-              wx.setStorageSync('adminAuthorized', true);
-              this.setData({ isAdmin: true });
               wx.navigateTo({
                 url: '/pages/admin/admin'
               });
@@ -99,42 +94,6 @@ Page({
         }
       });
     }
-  },
-
-  // 删除记录
-  deleteRecord: function (e) {
-    const { recordid } = e.currentTarget.dataset;
-    wx.showModal({
-      title: '确认删除',
-      content: '确定要删除这条记录吗？',
-      success: (res) => {
-        if (res.confirm) {
-          this.doDelete(recordid);
-        }
-      }
-    });
-  },
-
-  doDelete: function (recordid) {
-    wx.showLoading({ title: '删除中...' });
-    wx.cloud.callFunction({
-      name: 'deleteRecord',
-      data: { recordId: recordid },
-      success: (res) => {
-        wx.hideLoading();
-        if (res.result.success) {
-          wx.showToast({ title: '删除成功', icon: 'success' });
-          this.loadHistory();
-        } else {
-          wx.showToast({ title: '删除失败', icon: 'none' });
-        }
-      },
-      fail: (err) => {
-        wx.hideLoading();
-        wx.showToast({ title: '删除失败', icon: 'none' });
-        console.error(err);
-      }
-    });
   },
 
   formatDate: function (timestamp) {
@@ -168,5 +127,11 @@ Page({
     const { records, currentSource } = this.data;
     if (currentSource === 'all') return records;
     return records.filter(item => item.source === currentSource);
+  },
+
+  goTrend: function () {
+    wx.navigateTo({
+      url: '/pages/trend/trend'
+    });
   }
 });

@@ -2,7 +2,8 @@
   "pages": [
     "pages/index/index",
     "pages/admin/admin",
-    "pages/result/result"
+    "pages/result/result",
+    "pages/trend/trend"
   ],
   "window": {
     "backgroundTextStyle": "light",

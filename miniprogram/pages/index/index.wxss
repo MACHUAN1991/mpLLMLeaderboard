@@ -242,6 +242,18 @@
   font-size: 24rpx;
   color: #8892b0;
   margin-bottom: 30rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.trend-link {
+  color: #9370db;
+  font-size: 24rpx;
+  padding: 8rpx 16rpx;
+  background: rgba(147, 112, 219, 0.1);
+  border-radius: 20rpx;
+  border: 1rpx solid rgba(147, 112, 219, 0.3);
 }
 
 /* 隐藏的管理入口触发区域 */

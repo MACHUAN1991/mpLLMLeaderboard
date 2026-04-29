@@ -1,0 +1,65 @@
+<view class="container">
+  <view class="header">
+    <text class="title">排名趋势</text>
+    <text class="subtitle">Artificial Analysis 近14天排名变化</text>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:elif="{{dates.length === 0}}" class="empty-state">
+    <text class="empty-icon">📊</text>
+    <text class="empty-text">暂无趋势数据</text>
+    <text class="empty-hint">需要近14天内上传至少2条 Artificial Analysis 数据</text>
+  </view>
+
+  <view wx:else>
+    <!-- 折线图 -->
+    <view class="chart-section">
+      <view class="section-header">
+        <text class="section-title">排名变化趋势</text>
+        <text class="section-hint">近14天数据</text>
+      </view>
+      <canvas id="trendCanvas" type="2d" class="trend-canvas" style="height: {{chartHeight}}px;"></canvas>
+    </view>
+
+    <!-- 排名变化详情 -->
+    <view class="table-section">
+      <view class="section-header">
+        <text class="section-title">模型排名详情</text>
+        <text class="section-hint">点击展开/收起</text>
+      </view>
+
+      <!-- 每个模型一张卡片 -->
+      <view wx:for="{{tableData}}" wx:key="name" class="model-card" bindtap="toggleCard" data-index="{{index}}">
+        <view class="model-header">
+          <view class="model-rank-badge rank-badge-{{item.currentRank <= 3 ? item.currentRank : 'normal'}}">
+            <text>#{{item.currentRank}}</text>
+          </view>
+          <view class="model-info">
+            <text class="model-name">{{item.name}}</text>
+            <text class="model-org">{{item.organization}}</text>
+          </view>
+          <view class="change-badge {{item.changeClass}}">
+            <text wx:if="{{item.changeClass === 'rise'}}">↑{{item.changeNum}}</text>
+            <text wx:elif="{{item.changeClass === 'fall'}}">↓{{item.changeNum}}</text>
+            <text wx:else>→</text>
+          </view>
+        </view>
+
+        <view class="rank-timeline" wx:if="{{item.expanded}}">
+          <view wx:for="{{item.timeline}}" wx:for-item="point" wx:key="date" class="timeline-point">
+            <view class="point-rank rank-{{point.rank <= 3 ? point.rank : 'normal'}}">
+              <text>#{{point.rank}}</text>
+            </view>
+            <text class="point-date">{{point.shortDate}}</text>
+            <text class="point-score">{{point.score}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <button class="btn-back" bindtap="goBack">返回</button>
+</view>
