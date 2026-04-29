@@ -22,6 +22,14 @@ Page({
     };
   },
 
+  // 分享到朋友圈
+  onShareTimeline: function () {
+    return {
+      title: '全球AI大模型排名',
+      query: ''
+    };
+  },
+
   onShow: function () {
     this.loadHistory();
   },
