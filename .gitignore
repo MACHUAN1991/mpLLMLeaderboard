@@ -1,0 +1,13 @@
+# 云函数配置（包含敏感信息）
+cloudfunctions/*/config.json
+
+# 环境变量
+.env
+.env.local
+
+# Node modules
+node_modules/
+
+# IDE
+.vscode/
+.idea/

@@ -3,8 +3,8 @@ const axios = require('axios');
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 
-// MiniMax API 配置
-const MINIMAX_API_KEY = 'sk-cp-IZRYLuOD2w5M9nMBUppkBvylueSSieRXFq5TPw_C7xYu4JqsKCRqjsUMQgnOuafMgD_NXgvol7x-uzc5oOBxuohPBa0H97X4vNKr0NCkEgc_PzJiOwjGMw0';
+// MiniMax API 配置 - 从环境变量读取
+const MINIMAX_API_KEY = process.env.MINIMAX_API_KEY;
 // 国内版 Token Plan 视觉理解端点
 const MINIMAX_API_URL = 'https://api.minimaxi.com/v1/coding_plan/vlm';
 
