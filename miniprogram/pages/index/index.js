@@ -11,6 +11,16 @@ Page({
   },
 
   onLoad: function () {
+    // 先读缓存快速展示，再后台刷新
+    const cached = wx.getStorageSync('history_cache');
+    if (cached && cached.data) {
+      this.setData({
+        records: cached.data,
+        loading: false,
+        empty: cached.data.length === 0
+      });
+      this.applyFilter();
+    }
     this.loadHistory();
   },
 
@@ -41,7 +51,11 @@ Page({
   },
 
   loadHistory: function (callback) {
-    this.setData({ loading: true });
+    // 有缓存时不显示 loading 动画，直接展示缓存数据
+    const hasData = this.data.records.length > 0;
+    if (!hasData) {
+      this.setData({ loading: true });
+    }
 
     wx.cloud.callFunction({
       name: 'getHistory',
@@ -49,20 +63,23 @@ Page({
       success: (res) => {
         console.log('历史记录:', res.result);
         if (res.result.success) {
+          const data = res.result.data || [];
           this.setData({
-            records: res.result.data || [],
-            empty: !res.result.data || res.result.data.length === 0,
+            records: data,
+            empty: data.length === 0,
             loading: false
           });
-          this.applyFilter();  // 初始化筛选
+          this.applyFilter();
+          // 写入缓存
+          wx.setStorageSync('history_cache', { data, time: Date.now() });
         } else {
           console.error('获取失败:', res.result.error);
-          this.setData({ empty: true, loading: false });
+          this.setData({ loading: false });
         }
       },
       fail: (err) => {
         console.error('调用失败:', err);
-        this.setData({ empty: true, loading: false });
+        this.setData({ loading: false });
       },
       complete: () => {
         if (callback) callback();
