@@ -15,7 +15,8 @@ Page({
     stats: {
       total: 0,
       showing: 0
-    }
+    },
+    exportImagePath: ''
   },
 
   onLoad: function (options) {
@@ -27,6 +28,20 @@ Page({
       // 兼容旧方式：直接从URL解析
       this.parseFromUrl(options);
     }
+  },
+
+  onShareAppMessage: function () {
+    if (this.data.exportImagePath) {
+      return {
+        title: '全球AI大模型排名 - ' + this.data.date,
+        path: '/pages/result/result?recordId=' + (this.options.recordId || '') + '&date=' + encodeURIComponent(this.options.date || ''),
+        imageUrl: this.data.exportImagePath
+      };
+    }
+    return {
+      title: '全球AI大模型排名',
+      path: '/pages/index/index'
+    };
   },
 
   onPullDownRefresh: function () {
@@ -243,6 +258,272 @@ Page({
       data: this.data.rawData,
       success: () => {
         wx.showToast({ title: '已复制', icon: 'success' });
+      }
+    });
+  },
+
+  // 导出图片
+  exportImage: function () {
+    if (!this.data.filteredRankings.length) {
+      wx.showToast({ title: '没有可导出的数据', icon: 'none' });
+      return;
+    }
+    wx.showLoading({ title: '生成图片中...' });
+    this.drawExportCanvas().then((tempFilePath) => {
+      wx.hideLoading();
+      this.setData({ exportImagePath: tempFilePath });
+      wx.showActionSheet({
+        itemList: ['保存到相册', '分享给朋友'],
+        success: (res) => {
+          if (res.tapIndex === 0) {
+            this.saveImageToAlbum(tempFilePath);
+          } else if (res.tapIndex === 1) {
+            // 分享通过 onShareAppMessage 触发
+            wx.showToast({ title: '请点击右上角分享', icon: 'none' });
+          }
+        }
+      });
+    }).catch((err) => {
+      wx.hideLoading();
+      console.error('导出图片失败:', err);
+      wx.showToast({ title: '导出失败', icon: 'none' });
+    });
+  },
+
+  // Canvas 绘制排行榜图片
+  drawExportCanvas: function () {
+    return new Promise((resolve, reject) => {
+      const query = wx.createSelectorQuery();
+      query.select('#exportCanvas')
+        .fields({ node: true, size: true })
+        .exec((res) => {
+          if (!res[0] || !res[0].node) {
+            reject(new Error('Canvas 节点未找到'));
+            return;
+          }
+
+          const canvas = res[0].node;
+          const ctx = canvas.getContext('2d');
+          const dpr = wx.getWindowInfo().pixelRatio;
+          const width = 750;
+
+          const rankings = this.data.filteredRankings.slice(0, 50);
+          const isAA = this.data.source === 'artificial-analysis';
+          const rowHeight = isAA ? 56 : 40;
+          const headerHeight = 120;
+          const footerHeight = 60;
+          const tableHeaderHeight = 40;
+          const height = headerHeight + tableHeaderHeight + rankings.length * rowHeight + footerHeight;
+
+          canvas.width = width * dpr;
+          canvas.height = height * dpr;
+          ctx.scale(dpr, dpr);
+
+          // 背景
+          ctx.fillStyle = '#1a1a2e';
+          ctx.fillRect(0, 0, width, height);
+
+          // 标题区
+          ctx.fillStyle = '#16213e';
+          ctx.fillRect(0, 0, width, headerHeight);
+
+          ctx.fillStyle = '#ffffff';
+          ctx.font = 'bold 28px sans-serif';
+          ctx.textAlign = 'left';
+          ctx.fillText('全球AI大模型排名', 30, 45);
+
+          // 来源标签
+          const sourceLabels = { arena: 'Arena', 'huggingface': 'HuggingFace', 'artificial-analysis': 'AA' };
+          const sourceColors = { arena: '#c9a96e', 'huggingface': '#7fb3d3', 'artificial-analysis': '#9575cd' };
+          const label = sourceLabels[this.data.source] || 'Arena';
+          const color = sourceColors[this.data.source] || '#c9a96e';
+
+          ctx.font = 'bold 16px sans-serif';
+          const labelWidth = ctx.measureText(label).width + 20;
+          ctx.fillStyle = color + '33';
+          this.roundRect(ctx, 30, 58, labelWidth, 26, 6);
+          ctx.fill();
+          ctx.fillStyle = color;
+          ctx.fillText(label, 40, 76);
+
+          // 日期
+          ctx.fillStyle = '#64ffda';
+          ctx.font = '16px sans-serif';
+          ctx.fillText(this.data.date, 30 + labelWidth + 15, 76);
+
+          // 数量统计
+          ctx.fillStyle = '#8892b0';
+          ctx.font = '14px sans-serif';
+          ctx.textAlign = 'right';
+          ctx.fillText('共 ' + this.data.stats.total + ' 个模型', width - 30, 76);
+          ctx.textAlign = 'left';
+
+          // 分割线
+          ctx.strokeStyle = 'rgba(100, 255, 218, 0.2)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(30, headerHeight - 10);
+          ctx.lineTo(width - 30, headerHeight - 10);
+          ctx.stroke();
+
+          // 表头
+          const tableTop = headerHeight;
+          ctx.fillStyle = 'rgba(100, 255, 218, 0.1)';
+          ctx.fillRect(20, tableTop, width - 40, tableHeaderHeight);
+
+          ctx.fillStyle = '#64ffda';
+          ctx.font = 'bold 15px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('排名', 55, tableTop + 27);
+          ctx.textAlign = 'left';
+          ctx.fillText(isAA ? '模型（价格/速度/上下文）' : '模型', 90, tableTop + 27);
+          ctx.textAlign = 'center';
+          ctx.fillText('厂商', 530, tableTop + 27);
+          ctx.textAlign = 'right';
+          ctx.fillText(isAA ? '智力' : '分数', width - 40, tableTop + 27);
+
+          // 数据行
+          rankings.forEach((item, index) => {
+            const y = tableTop + tableHeaderHeight + index * rowHeight;
+
+            // 斑马纹
+            if (index % 2 === 0) {
+              ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+              ctx.fillRect(20, y, width - 40, rowHeight);
+            }
+
+            // Top 3 高亮
+            if (item.rank === 1) {
+              ctx.fillStyle = 'rgba(255, 215, 0, 0.12)';
+              ctx.fillRect(20, y, width - 40, rowHeight);
+              ctx.strokeStyle = 'rgba(255, 215, 0, 0.3)';
+              ctx.lineWidth = 1;
+              ctx.strokeRect(20, y, width - 40, rowHeight);
+            } else if (item.rank === 2) {
+              ctx.fillStyle = 'rgba(192, 192, 192, 0.1)';
+              ctx.fillRect(20, y, width - 40, rowHeight);
+              ctx.strokeStyle = 'rgba(192, 192, 192, 0.25)';
+              ctx.lineWidth = 1;
+              ctx.strokeRect(20, y, width - 40, rowHeight);
+            } else if (item.rank === 3) {
+              ctx.fillStyle = 'rgba(205, 127, 50, 0.1)';
+              ctx.fillRect(20, y, width - 40, rowHeight);
+              ctx.strokeStyle = 'rgba(205, 127, 50, 0.25)';
+              ctx.lineWidth = 1;
+              ctx.strokeRect(20, y, width - 40, rowHeight);
+            }
+
+            // 排名
+            if (item.rank <= 3) {
+              const badgeColors = { 1: '#ffd700', 2: '#c0c0c0', 3: '#cd7f32' };
+              ctx.fillStyle = badgeColors[item.rank];
+              ctx.font = 'bold 16px sans-serif';
+            } else {
+              ctx.fillStyle = '#8892b0';
+              ctx.font = '15px sans-serif';
+            }
+            ctx.textAlign = 'center';
+            ctx.fillText('#' + item.rank, 55, y + (isAA ? 24 : 27));
+
+            // 模型名
+            ctx.fillStyle = item.rank <= 3 ? '#ffffff' : '#e0e0e0';
+            ctx.font = item.rank <= 3 ? 'bold 15px sans-serif' : '14px sans-serif';
+            ctx.textAlign = 'left';
+            const maxModelWidth = isAA ? 420 : 400;
+            let modelName = item.modelName || '';
+            if (ctx.measureText(modelName).width > maxModelWidth) {
+              while (ctx.measureText(modelName + '...').width > maxModelWidth && modelName.length > 0) {
+                modelName = modelName.slice(0, -1);
+              }
+              modelName += '...';
+            }
+            ctx.fillText(modelName, 90, y + (isAA ? 20 : 27));
+
+            // AA 额外信息
+            if (isAA) {
+              ctx.fillStyle = '#a8b2d1';
+              ctx.font = '12px sans-serif';
+              const extraY = y + 40;
+              ctx.fillText('💰 ' + (item.price || '-') + '  ⚡ ' + (item.speed || '-') + '  📐 ' + (item.contextLength || '-'), 90, extraY);
+            }
+
+            // 厂商
+            ctx.fillStyle = '#a8b2d1';
+            ctx.font = '14px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(item.organization || '', 530, y + (isAA ? 24 : 27));
+
+            // 分数
+            ctx.fillStyle = item.rank <= 3 ? '#ffd700' : '#8892b0';
+            ctx.font = item.rank <= 3 ? 'bold 15px sans-serif' : '14px sans-serif';
+            ctx.textAlign = 'right';
+            ctx.fillText(String(item.score || ''), width - 40, y + (isAA ? 24 : 27));
+          });
+
+          // 底部水印
+          const footerY = tableTop + tableHeaderHeight + rankings.length * rowHeight + 20;
+          ctx.fillStyle = '#8892b0';
+          ctx.font = '12px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('AI大模型排行榜 · 来源：' + label, width / 2, footerY + 20);
+
+          // 导出为临时文件
+          setTimeout(() => {
+            wx.canvasToTempFilePath({
+              canvas: canvas,
+              width: width * dpr,
+              height: height * dpr,
+              destWidth: width * 2,
+              destHeight: height * 2,
+              success: (res) => {
+                resolve(res.tempFilePath);
+              },
+              fail: (err) => {
+                reject(err);
+              }
+            });
+          }, 200);
+        });
+    });
+  },
+
+  // 圆角矩形辅助方法
+  roundRect: function (ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.arcTo(x + w, y, x + w, y + r, r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+    ctx.lineTo(x + r, y + h);
+    ctx.arcTo(x, y + h, x, y + h - r, r);
+    ctx.lineTo(x, y + r);
+    ctx.arcTo(x, y, x + r, y, r);
+    ctx.closePath();
+  },
+
+  // 保存图片到相册
+  saveImageToAlbum: function (filePath) {
+    wx.saveImageToPhotosAlbum({
+      filePath: filePath,
+      success: () => {
+        wx.showToast({ title: '已保存到相册', icon: 'success' });
+      },
+      fail: (err) => {
+        if (err.errMsg.includes('auth deny') || err.errMsg.includes('authorize')) {
+          wx.showModal({
+            title: '提示',
+            content: '需要您授权保存图片到相册',
+            confirmText: '去授权',
+            success: (res) => {
+              if (res.confirm) {
+                wx.openSetting();
+              }
+            }
+          });
+        } else {
+          wx.showToast({ title: '保存失败', icon: 'none' });
+        }
       }
     });
   },

@@ -7,6 +7,9 @@
     </view>
     <view class="header-actions">
       <text class="stats">{{stats.showing}} / {{stats.total}}</text>
+      <view class="export-btn" bindtap="exportImage">
+        <text>导出图片</text>
+      </view>
     </view>
   </view>
 
@@ -82,4 +85,7 @@
   </view>
 
   <button class="btn-back" bindtap="goBack">返回</button>
+
+  <!-- 隐藏的导出画布 -->
+  <canvas id="exportCanvas" type="2d" class="export-canvas"></canvas>
 </view>
