@@ -35,27 +35,45 @@
     <text class="empty-hint">管理员上传后将显示在这里</text>
   </view>
 
-  <view wx:else class="record-list">
-    <view wx:for="{{displayRecords}}" wx:key="recordId" class="record-card" data-recordid="{{item.recordId}}" data-date="{{item.date}}" bindtap="viewDetail">
-      <view class="card-header">
-        <view class="source-badge source-{{item.source}}">{{item.source === 'huggingface' ? 'HF' : item.source === 'artificial-analysis' ? 'AA' : 'Arena'}}</view>
-        <text class="card-date">{{item.date}}</text>
-        <view class="card-actions">
-          <text class="card-count">{{item.totalModels}} 个模型</text>
+  <!-- 最新排名展示 -->
+  <view wx:elif="{{!showHistory}}" class="latest-rankings">
+    <view wx:if="{{rankingsLoading}}" class="loading">
+      <text>加载排名中...</text>
+    </view>
+    <view wx:elif="{{latestRecord}}" class="ranking-container">
+      <view class="ranking-header">
+        <text class="ranking-date source-color-{{currentSource}}">{{latestRecord.date}}</text>
+        <text class="ranking-count">共 {{latestRecord.totalModels}} 个模型</text>
+      </view>
+      <view class="ranking-list">
+        <view wx:for="{{latestRankings}}" wx:key="rank" class="ranking-card">
+          <view class="ranking-card-header">
+            <view class="rank-badge rank-{{item.rank <= 3 ? item.rank : 'normal'}}">{{item.rank}}</view>
+            <view class="ranking-model-info">
+              <text class="ranking-model-name">{{item.modelName}}</text>
+              <text class="ranking-model-org" wx:if="{{item.organization}}">{{item.organization}}</text>
+            </view>
+            <text class="ranking-model-score source-color-{{currentSource}}" wx:if="{{item.score}}">{{item.score}}</text>
+          </view>
+          <view class="ranking-card-details" wx:if="{{currentSource === 'artificial-analysis'}}">
+            <view class="detail-item">
+              <text class="detail-label">价格</text>
+              <text class="detail-value detail-price">{{item.price || '-'}}</text>
+            </view>
+            <view class="detail-item">
+              <text class="detail-label">速度</text>
+              <text class="detail-value detail-speed">{{item.speed || '-'}}</text>
+            </view>
+            <view class="detail-item">
+              <text class="detail-label">上下文</text>
+              <text class="detail-value detail-context">{{item.contextLength || '-'}}</text>
+            </view>
+          </view>
         </view>
       </view>
-
-      <view class="top3-preview">
-        <view wx:for="{{item.top3}}" wx:for-item="topItem" wx:for-index="idx" wx:key="rank" class="top-item top-{{idx + 1}}">
-          <text class="top-rank">#{{topItem.rank}}</text>
-          <text class="top-name">{{topItem.modelName}}</text>
-        </view>
-      </view>
-
-      <view class="card-footer">
-        <text class="card-time">{{formatDate(item.timestamp)}}</text>
-        <text class="view-more">查看完整排名 -></text>
-      </view>
+    </view>
+    <view wx:else class="empty-state">
+      <text class="empty-text">暂无排名数据</text>
     </view>
   </view>
 

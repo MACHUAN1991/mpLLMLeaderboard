@@ -297,3 +297,184 @@
   height: 120rpx;
   opacity: 0;
 }
+
+/* 最新排名展示区域 */
+.latest-rankings {
+  margin-top: 16rpx;
+}
+
+.ranking-container {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 20rpx;
+  padding: 24rpx;
+  border: 1rpx solid rgba(100, 255, 218, 0.1);
+}
+
+.ranking-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+  padding-bottom: 16rpx;
+  border-bottom: 1rpx solid rgba(255, 255, 255, 0.05);
+}
+
+.ranking-date {
+  font-size: 28rpx;
+  font-weight: bold;
+}
+
+.ranking-count {
+  font-size: 22rpx;
+  color: #8892b0;
+  background: rgba(100, 255, 218, 0.1);
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+}
+
+/* 卡片排名列表 */
+.ranking-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.ranking-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16rpx;
+  padding: 20rpx;
+  border: 1rpx solid rgba(100, 255, 218, 0.1);
+}
+
+.ranking-card-header {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 16rpx;
+}
+
+.rank-badge {
+  width: 52rpx;
+  height: 52rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  font-weight: bold;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.rank-1 {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.3) 0%, rgba(255, 215, 0, 0.1) 100%);
+  color: #ffd700;
+  border: 1rpx solid rgba(255, 215, 0, 0.4);
+}
+
+.rank-2 {
+  background: linear-gradient(135deg, rgba(192, 192, 192, 0.25) 0%, rgba(192, 192, 192, 0.08) 100%);
+  color: #c0c0c0;
+  border: 1rpx solid rgba(192, 192, 192, 0.35);
+}
+
+.rank-3 {
+  background: linear-gradient(135deg, rgba(205, 127, 50, 0.25) 0%, rgba(205, 127, 50, 0.08) 100%);
+  color: #cd7f32;
+  border: 1rpx solid rgba(205, 127, 50, 0.35);
+}
+
+.rank-normal {
+  background: rgba(255, 255, 255, 0.08);
+  color: #8892b0;
+}
+
+.ranking-model-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.ranking-model-name {
+  font-size: 28rpx;
+  color: #fff;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ranking-model-org {
+  font-size: 22rpx;
+  color: #8892b0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ranking-model-score {
+  font-size: 28rpx;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+/* 来源颜色 */
+.source-color-artificial-analysis {
+  color: #9575cd;
+}
+
+.source-color-arena {
+  color: #c9a96e;
+}
+
+.source-color-huggingface {
+  color: #7fb3d3;
+}
+
+.ranking-card-details {
+  display: flex;
+  gap: 12rpx;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4rpx;
+  padding: 10rpx 14rpx;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8rpx;
+  flex: 1;
+  min-width: 0;
+}
+
+.detail-item:first-child {
+  flex: 1.5;
+}
+
+.detail-label {
+  font-size: 20rpx;
+  color: #8892b0;
+}
+
+.detail-value {
+  font-size: 22rpx;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.detail-price {
+  color: #c9a96e;
+  white-space: nowrap;
+}
+
+.detail-speed {
+  color: #7fb3d3;
+}
+
+.detail-context {
+  color: #4db6ac;
+}

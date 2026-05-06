@@ -7,7 +7,11 @@ Page({
     currentSource: 'artificial-analysis',
     filteredCount: 0,
     displayRecords: [],
-    adminTapCount: 0
+    adminTapCount: 0,
+    // 最新排名相关
+    latestRecord: null,
+    latestRankings: [],
+    rankingsLoading: false
   },
 
   onLoad: function () {
@@ -20,6 +24,7 @@ Page({
         empty: cached.data.length === 0
       });
       this.applyFilter();
+      this.loadLatestRankings();
     }
     this.loadHistory();
   },
@@ -70,6 +75,7 @@ Page({
             loading: false
           });
           this.applyFilter();
+          this.loadLatestRankings();
           // 写入缓存
           wx.setStorageSync('history_cache', { data, time: Date.now() });
         } else {
@@ -92,6 +98,72 @@ Page({
     wx.navigateTo({
       url: `/pages/result/result?recordId=${recordid}&date=${encodeURIComponent(date)}`
     });
+  },
+
+  // 加载最新排名数据
+  loadLatestRankings: function () {
+    const { records, currentSource } = this.data;
+    // 获取当前来源的最新记录
+    let filtered = records;
+    if (currentSource !== 'all') {
+      filtered = records.filter(item => item.source === currentSource);
+    }
+    const latestRecord = filtered[0]; // 已按时间倒序
+    if (!latestRecord) {
+      this.setData({ latestRecord: null, latestRankings: [] });
+      return;
+    }
+
+    this.setData({ rankingsLoading: true });
+
+    wx.cloud.callFunction({
+      name: 'getRecordDetail',
+      data: { recordId: latestRecord.recordId },
+      success: (res) => {
+        if (res.result.success) {
+          const rankings = res.result.data.rankings || [];
+          const processedRankings = this.processRankings(rankings);
+          this.setData({
+            latestRecord: latestRecord,
+            latestRankings: processedRankings,
+            rankingsLoading: false
+          });
+        } else {
+          console.error('获取排名失败:', res.result.error);
+          this.setData({ rankingsLoading: false });
+        }
+      },
+      fail: (err) => {
+        console.error('调用失败:', err);
+        this.setData({ rankingsLoading: false });
+      }
+    });
+  },
+
+  // 处理排名数据（兼容多种字段命名格式）
+  processRankings: function (rankings) {
+    if (!rankings || !Array.isArray(rankings)) return [];
+
+    return rankings.map(item => {
+      // 处理字段名兼容性
+      const rank = item.rank || item.Rank || item['排名'] || 0;
+      const modelName = item.modelName || item.model_name || item.Model || item['模型'] || '';
+      const organization = item.organization || item.Organization || item['厂商'] || '';
+      const score = item.score || item.Score || item['分数'] || item.Elo || '';
+      const price = item.price || item.Price || item['价格'] || '';
+      const speed = item.speed || item.Speed || item['速度'] || '';
+      const contextLength = item.contextLength || item.context_length || item['上下文长度'] || '';
+
+      return {
+        rank: parseInt(rank) || 0,
+        modelName,
+        organization,
+        score,
+        price,
+        speed,
+        contextLength
+      };
+    }).sort((a, b) => a.rank - b.rank);
   },
 
   // 连续点击触发管理入口
@@ -132,6 +204,7 @@ Page({
     const source = e.currentTarget.dataset.source;
     this.setData({ currentSource: source });
     this.applyFilter();
+    this.loadLatestRankings();
   },
 
   // 根据来源筛选记录
