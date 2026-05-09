@@ -3,6 +3,7 @@ Page({
   data: {
     date: '',
     source: 'arena',  // 来源：arena / huggingface
+    subCategory: '',
     rankings: [],
     filteredRankings: [],
     searchKey: '',
@@ -62,7 +63,8 @@ Page({
         console.log('getRecordDetail 返回:', res.result);
         if (res.result.success) {
           const source = res.result.data.source || 'arena';
-          this.processRankings(res.result.data, decodeURIComponent(date || ''), source);
+          const subCategory = res.result.data.subCategory || '';
+          this.processRankings(res.result.data, decodeURIComponent(date || ''), source, subCategory);
         } else {
           wx.showToast({ title: '加载失败', icon: 'none' });
         }
@@ -95,7 +97,7 @@ Page({
     return `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
   },
 
-  processRankings: function (data, date, source) {
+  processRankings: function (data, date, source, subCategory) {
     console.log('processRankings 收到的数据:', data);
 
     // 兼容多种格式：Ranking / rankings / Rankings / Models
@@ -138,6 +140,7 @@ Page({
     this.setData({
       date: this.formatDate(date),
       source: source || 'arena',
+      subCategory: subCategory || '',
       rankings: normalizedRankings,
       filteredRankings: normalizedRankings,
       organizations: allOrganizations,
@@ -336,15 +339,16 @@ Page({
           const sourceLabels = { arena: 'Arena', 'huggingface': 'HuggingFace', 'artificial-analysis': 'AA' };
           const sourceColors = { arena: '#c9a96e', 'huggingface': '#7fb3d3', 'artificial-analysis': '#9575cd' };
           const label = sourceLabels[this.data.source] || 'Arena';
+          const displayLabel = this.data.source === 'arena' && this.data.subCategory ? label + ' - ' + this.data.subCategory : label;
           const color = sourceColors[this.data.source] || '#c9a96e';
 
           ctx.font = 'bold 16px sans-serif';
-          const labelWidth = ctx.measureText(label).width + 20;
+          const labelWidth = ctx.measureText(displayLabel).width + 20;
           ctx.fillStyle = color + '33';
           this.roundRect(ctx, 30, 58, labelWidth, 26, 6);
           ctx.fill();
           ctx.fillStyle = color;
-          ctx.fillText(label, 40, 76);
+          ctx.fillText(displayLabel, 40, 76);
 
           // 日期
           ctx.fillStyle = '#64ffda';
@@ -465,7 +469,7 @@ Page({
           ctx.fillStyle = '#8892b0';
           ctx.font = '12px sans-serif';
           ctx.textAlign = 'center';
-          ctx.fillText('AI大模型排行榜 · 来源：' + label, width / 2, footerY + 20);
+          ctx.fillText('AI大模型排行榜 · 来源：' + displayLabel, width / 2, footerY + 20);
 
           // 导出为临时文件
           setTimeout(() => {

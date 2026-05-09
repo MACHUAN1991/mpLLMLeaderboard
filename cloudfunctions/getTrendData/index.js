@@ -4,18 +4,22 @@ cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 
 exports.main = async (event, context) => {
   const db = cloud.database();
-  const { source = 'artificial-analysis' } = event;
+  const { source = 'artificial-analysis', subCategory = '' } = event;
 
   // 计算14天前的时间戳
   const fourteenDaysAgo = Date.now() - 14 * 24 * 60 * 60 * 1000;
 
   try {
     // 1. 获取该来源最近一周的记录（按时间升序）
+    const whereCondition = {
+      source,
+      timestamp: db.command.gte(fourteenDaysAgo)
+    };
+    if (subCategory) {
+      whereCondition.subCategory = subCategory;
+    }
     const recordsResult = await db.collection('analysis_records')
-      .where({
-        source,
-        timestamp: db.command.gte(fourteenDaysAgo)
-      })
+      .where(whereCondition)
       .orderBy('timestamp', 'asc')
       .limit(100)
       .get();

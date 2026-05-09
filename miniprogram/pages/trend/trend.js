@@ -8,6 +8,7 @@ Page({
     chartHeight: 500,
     scrollTop: 0,
     source: 'artificial-analysis',
+    subCategory: '',
     colors: [
       '#9575cd', '#c9a96e', '#7fb3d3', '#64ffda', '#00bcd4',
       '#ff9800', '#e91e63', '#8bc34a', '#3f51b5', '#ff5722',
@@ -17,7 +18,8 @@ Page({
 
   onLoad: function (options) {
     const source = options.source || 'artificial-analysis';
-    this.setData({ source });
+    const subCategory = options.subCategory || '';
+    this.setData({ source, subCategory });
     this.loadTrendData();
   },
 
@@ -32,7 +34,7 @@ Page({
 
     wx.cloud.callFunction({
       name: 'getTrendData',
-      data: { source: this.data.source },
+      data: { source: this.data.source, subCategory: this.data.subCategory },
       success: (res) => {
         if (res.result.success) {
           const { dates, models } = res.result.data;

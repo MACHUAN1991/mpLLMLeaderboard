@@ -2,7 +2,7 @@
   <view class="header">
     <text class="title">排名趋势</text>
     <text class="subtitle subtitle-{{source}}" wx:if="{{source === 'artificial-analysis'}}">Artificial Analysis 近14天排名变化</text>
-    <text class="subtitle subtitle-{{source}}" wx:elif="{{source === 'arena'}}">Arena 近14天排名变化</text>
+    <text class="subtitle subtitle-{{source}}" wx:elif="{{source === 'arena'}}">Arena{{subCategory ? ' - ' + subCategory : ''}} 近14天排名变化</text>
     <text class="subtitle subtitle-{{source}}" wx:elif="{{source === 'huggingface'}}">Hugging Face 近14天排名变化</text>
   </view>
 

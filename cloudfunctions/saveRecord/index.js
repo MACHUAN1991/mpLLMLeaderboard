@@ -13,7 +13,7 @@ function generateUUID() {
 
 exports.main = async (event, context) => {
   const db = cloud.database();
-  const { date, rankings, imageFileId, source } = event;
+  const { date, rankings, imageFileId, source, subCategory } = event;
 
   if (!rankings || !Array.isArray(rankings)) {
     return { success: false, error: '缺少排名数据' };
@@ -22,6 +22,8 @@ exports.main = async (event, context) => {
   try {
     const recordId = generateUUID();
     const timestamp = Date.now();
+    const now = new Date();
+    const uploadDate = `${now.getFullYear()}.${now.getMonth() + 1}.${now.getDate()}`;
 
     // 提取厂商列表
     const organizations = [...new Set(rankings.map(r => r.organization || r.Organization || ''))].filter(Boolean);
@@ -41,8 +43,9 @@ exports.main = async (event, context) => {
     const mainResult = await db.collection('analysis_records').add({
       data: {
         recordId,
-        date: date || '',
+        date: uploadDate,
         source: source || 'arena',  // 添加来源字段
+        subCategory: subCategory || '',
         timestamp,
         imageFileId: imageFileId || '',
         totalModels: rankings.length,

@@ -4,7 +4,19 @@ Page({
     records: [],
     loading: true,
     empty: true,
-    currentSource: 'artificial-analysis',
+    currentSource: 'arena',
+    arenaSubCategories: [
+      { key: 'text', label: 'Text' },
+      { key: 'search', label: 'Search' },
+      { key: 'vision', label: 'Vision' },
+      { key: 'document', label: 'Document' },
+      { key: 'webdev', label: 'WebDev' },
+      { key: 'text-to-image', label: 'Text-to-Image' },
+      { key: 'image-edit', label: 'Image Edit' },
+      { key: 'text-to-video', label: 'Text-to-Video' },
+      { key: 'image-to-video', label: 'Image-to-Video' }
+    ],
+    currentSubCategory: 'text',
     filteredCount: 0,
     displayRecords: [],
     adminTapCount: 0,
@@ -102,11 +114,14 @@ Page({
 
   // 加载最新排名数据
   loadLatestRankings: function () {
-    const { records, currentSource } = this.data;
+    const { records, currentSource, currentSubCategory } = this.data;
     // 获取当前来源的最新记录
     let filtered = records;
     if (currentSource !== 'all') {
       filtered = records.filter(item => item.source === currentSource);
+      if (currentSource === 'arena') {
+        filtered = filtered.filter(item => (item.subCategory || '') === currentSubCategory);
+      }
     }
     const latestRecord = filtered[0]; // 已按时间倒序
     if (!latestRecord) {
@@ -207,12 +222,24 @@ Page({
     this.loadLatestRankings();
   },
 
+  // 切换Arena子分类
+  switchSubCategory: function (e) {
+    const key = e.currentTarget.dataset.key;
+    this.setData({ currentSubCategory: key });
+    this.applyFilter();
+    this.loadLatestRankings();
+  },
+
   // 根据来源筛选记录
   applyFilter: function () {
-    const { records, currentSource } = this.data;
+    const { records, currentSource, currentSubCategory } = this.data;
     let filtered = records;
     if (currentSource !== 'all') {
       filtered = records.filter(item => item.source === currentSource);
+      // Arena来源按子分类筛选
+      if (currentSource === 'arena') {
+        filtered = filtered.filter(item => (item.subCategory || '') === currentSubCategory);
+      }
     }
     this.setData({
       filteredCount: filtered.length,
@@ -229,8 +256,9 @@ Page({
 
   goTrend: function (e) {
     const source = e.currentTarget.dataset.source || 'artificial-analysis';
+    const subCategory = source === 'arena' ? this.data.currentSubCategory : '';
     wx.navigateTo({
-      url: `/pages/trend/trend?source=${source}`
+      url: `/pages/trend/trend?source=${source}&subCategory=${subCategory}`
     });
   }
 });

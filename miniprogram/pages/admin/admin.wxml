@@ -6,10 +6,18 @@
   <view class="source-selector">
     <text class="selector-label">选择排名来源：</text>
     <view class="source-tabs">
-      <view class="source-tab {{source === 'artificial-analysis' ? 'active' : ''}}" data-source="artificial-analysis" bindtap="selectSource">Artificial Analysis</view>
       <view class="source-tab {{source === 'arena' ? 'active' : ''}}" data-source="arena" bindtap="selectSource">Arena</view>
+      <view class="source-tab {{source === 'artificial-analysis' ? 'active' : ''}}" data-source="artificial-analysis" bindtap="selectSource">Artificial Analysis</view>
       <view class="source-tab {{source === 'huggingface' ? 'active' : ''}}" data-source="huggingface" bindtap="selectSource">Hugging Face</view>
     </view>
+  </view>
+
+  <!-- Arena子分类 -->
+  <view wx:if="{{source === 'arena'}}" class="sub-category-selector">
+    <text class="selector-label">选择子分类：</text>
+    <scroll-view scroll-x class="sub-category-tabs">
+      <view wx:for="{{arenaSubCategories}}" wx:key="key" class="sub-category-tab {{currentSubCategory === item.key ? 'active' : ''}}" data-key="{{item.key}}" bindtap="switchSubCategory">{{item.label}}</view>
+    </scroll-view>
   </view>
 
   <view class="upload-area" bindtap="chooseImage">
@@ -53,7 +61,7 @@
     <view wx:else class="record-list">
       <view wx:for="{{records}}" wx:key="recordId" class="record-item">
         <view class="record-info">
-          <view class="record-source source-{{item.source}}">{{item.source === 'huggingface' ? 'HF' : item.source === 'artificial-analysis' ? 'AA' : 'Arena'}}</view>
+          <view class="record-source source-{{item.source}}">{{item.source === 'huggingface' ? 'HF' : item.source === 'artificial-analysis' ? 'AA' : 'Arena'}}{{item.subCategory ? ' - ' + item.subCategory : ''}}</view>
           <text class="record-date">{{item.date}}</text>
           <text class="record-count">{{item.totalModels}} 个模型</text>
         </view>

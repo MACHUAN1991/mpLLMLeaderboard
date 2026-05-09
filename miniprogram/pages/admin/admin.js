@@ -6,7 +6,19 @@ Page({
     result: null,
     error: null,
     analyzingStep: '',
-    source: 'artificial-analysis',
+    source: 'arena',
+    arenaSubCategories: [
+      { key: 'text', label: 'Text' },
+      { key: 'search', label: 'Search' },
+      { key: 'vision', label: 'Vision' },
+      { key: 'document', label: 'Document' },
+      { key: 'webdev', label: 'WebDev' },
+      { key: 'text-to-image', label: 'Text-to-Image' },
+      { key: 'image-edit', label: 'Image Edit' },
+      { key: 'text-to-video', label: 'Text-to-Video' },
+      { key: 'image-to-video', label: 'Image-to-Video' }
+    ],
+    currentSubCategory: 'text',
     records: [],
     loadingRecords: false
   },
@@ -105,6 +117,12 @@ Page({
     this.setData({ source });
   },
 
+  // 选择Arena子分类
+  switchSubCategory: function (e) {
+    const key = e.currentTarget.dataset.key;
+    this.setData({ currentSubCategory: key });
+  },
+
   // 选择图片
   chooseImage: function () {
     wx.chooseImage({
@@ -180,7 +198,7 @@ Page({
 
       const analyzeResult = await wx.cloud.callFunction({
         name: 'analyzeImage',
-        data: { fileID, source: this.data.source },
+        data: { fileID, source: this.data.source, subCategory: this.data.source === 'arena' ? this.data.currentSubCategory : '' },
         timeout: 120000  // 120秒超时，云函数内部限制
       });
 
@@ -276,7 +294,8 @@ Page({
         date: data.Date || data.date || defaultDate,
         rankings: rankings,
         imageFileId: fileID || '',
-        source: this.data.source
+        source: this.data.source,
+        subCategory: this.data.source === 'arena' ? this.data.currentSubCategory : ''
       }
     });
   }

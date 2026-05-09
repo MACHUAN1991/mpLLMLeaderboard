@@ -36,6 +36,7 @@ exports.main = async (event, context) => {
       data: {
         date: record.date,
         source: record.source || 'arena',
+        subCategory: record.subCategory || '',
         rankings: rankings
       }
     };

@@ -1,8 +1,8 @@
 <view class="container container-{{currentSource}}">
   <view class="header-row">
     <view class="source-tabs">
-      <view class="source-tab {{currentSource === 'artificial-analysis' ? 'active active-aa' : ''}}" data-source="artificial-analysis" bindtap="switchSource">Artificial Analysis</view>
       <view class="source-tab {{currentSource === 'arena' ? 'active active-arena' : ''}}" data-source="arena" bindtap="switchSource">Arena</view>
+      <view class="source-tab {{currentSource === 'artificial-analysis' ? 'active active-aa' : ''}}" data-source="artificial-analysis" bindtap="switchSource">Artificial Analysis</view>
       <view class="source-tab {{currentSource === 'huggingface' ? 'active active-hf' : ''}}" data-source="huggingface" bindtap="switchSource">Hugging Face</view>
     </view>
   </view>
@@ -13,7 +13,14 @@
     <text class="trend-link trend-aa" bindtap="goTrend" data-source="artificial-analysis">查看排名变化趋势</text>
   </view>
   <view class="source-desc" wx:if="{{currentSource === 'arena'}}">
-    <text>盲测对战平台，用户匿名提出问题，两个模型给出回答，用户匿名投票选出哪个模型回答更好，综合得分进行排名</text>
+    <text>盲测对战平台，用户匿名提出问题，两个模型给出回答，用户匿名投票选出哪个模型回答更好，综合得分进行排名。</text>
+    <text class="source-desc-sub">根据不同任务和模态，共设Text、Search、Vision等9个类型的排行榜</text>
+  </view>
+  <!-- Arena子分类（放在介绍下面） -->
+  <view wx:if="{{currentSource === 'arena'}}" class="sub-category-row">
+    <scroll-view scroll-x class="sub-category-tabs">
+      <view wx:for="{{arenaSubCategories}}" wx:key="key" class="sub-category-tab {{currentSubCategory === item.key ? 'active' : ''}}" data-key="{{item.key}}" bindtap="switchSubCategory">{{item.label}}</view>
+    </scroll-view>
   </view>
   <view class="trend-btn-row" wx:if="{{currentSource === 'arena'}}">
     <text class="trend-link trend-arena" bindtap="goTrend" data-source="arena">查看排名变化趋势</text>
