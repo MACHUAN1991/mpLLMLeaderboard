@@ -1,0 +1,224 @@
+/* app.wxss - 全局样式 - 渐变卡片风格 */
+
+/* ========== 设计令牌 ========== */
+page {
+  --bg-primary: #0a0a1a;
+  --bg-secondary: #12122a;
+  --bg-card: rgba(255, 255, 255, 0.04);
+
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.55);
+  --text-tertiary: rgba(255, 255, 255, 0.35);
+
+  --accent: #64ffda;
+  --accent-bg: rgba(100, 255, 218, 0.1);
+  --accent-border: rgba(100, 255, 218, 0.25);
+
+  --source-aa: #9575cd;
+  --source-aa-bg: rgba(149, 117, 205, 0.15);
+  --source-arena: #e0975a;
+  --source-arena-bg: rgba(224, 151, 90, 0.15);
+  --source-hf: #7fb3d3;
+  --source-hf-bg: rgba(127, 179, 211, 0.15);
+
+  /* 渐变卡片色系 */
+  --grad-gold-from: #ffd700;
+  --grad-gold-to: #ff8c00;
+  --grad-purple-from: #a855f7;
+  --grad-purple-to: #7c3aed;
+  --grad-blue-from: #3b82f6;
+  --grad-blue-to: #06b6d4;
+  --grad-teal-from: #14b8a6;
+  --grad-teal-to: #0891b2;
+  --grad-pink-from: #ec4899;
+  --grad-pink-to: #f43f5e;
+
+  --rank-gold: #ffd700;
+  --rank-silver: #c0c0c0;
+  --rank-bronze: #cd7f32;
+
+  --danger: #ff5252;
+  --danger-bg: rgba(255, 82, 82, 0.12);
+
+  --radius-sm: 12rpx;
+  --radius-md: 20rpx;
+  --radius-lg: 28rpx;
+  --radius-xl: 36rpx;
+  --radius-pill: 100rpx;
+
+  --spacing-xs: 8rpx;
+  --spacing-sm: 16rpx;
+  --spacing-md: 24rpx;
+  --spacing-lg: 40rpx;
+}
+
+/* ========== 容器 ========== */
+.container {
+  min-height: 100vh;
+  padding: 40rpx;
+  background: linear-gradient(160deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  box-sizing: border-box;
+}
+
+/* ========== 渐变卡片 ========== */
+/* Top 1 金色渐变卡片 */
+.gradient-card-gold {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 140, 0, 0.08) 100%);
+  border: 1rpx solid rgba(255, 215, 0, 0.3);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8rpx 32rpx rgba(255, 215, 0, 0.12), inset 0 1rpx 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Arena琥珀色渐变卡片（暗色调） */
+.gradient-card-amber {
+  background: linear-gradient(135deg, rgba(224, 151, 90, 0.08) 0%, rgba(180, 100, 50, 0.02) 100%);
+  border: 1rpx solid rgba(224, 151, 90, 0.15);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8rpx 32rpx rgba(224, 151, 90, 0.06), inset 0 1rpx 0 rgba(255, 255, 255, 0.04);
+}
+
+/* Top 2 紫色渐变卡片 */
+.gradient-card-purple {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.18) 0%, rgba(124, 58, 237, 0.06) 100%);
+  border: 1rpx solid rgba(168, 85, 247, 0.28);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8rpx 32rpx rgba(168, 85, 247, 0.1), inset 0 1rpx 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Top 3 蓝色渐变卡片 */
+.gradient-card-blue {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.18) 0%, rgba(6, 182, 212, 0.06) 100%);
+  border: 1rpx solid rgba(59, 130, 246, 0.28);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8rpx 32rpx rgba(59, 130, 246, 0.1), inset 0 1rpx 0 rgba(255, 255, 255, 0.08);
+}
+
+/* 普通卡片 */
+.gradient-card-normal {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1rpx solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.15);
+}
+
+/* AA/Arena/HF 来源容器 - 统一背景 */
+.container-aa,
+.container-arena,
+.container-hf {
+  background: linear-gradient(160deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+}
+
+/* ========== 排名徽章 ========== */
+.rank-badge {
+  width: 56rpx;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26rpx;
+  font-weight: bold;
+  border-radius: 16rpx;
+  flex-shrink: 0;
+}
+
+.rank-1 {
+  background: linear-gradient(135deg, var(--grad-gold-from) 0%, var(--grad-gold-to) 100%);
+  color: #1a1a2e;
+  box-shadow: 0 4rpx 16rpx rgba(255, 215, 0, 0.3);
+}
+
+.rank-2 {
+  background: linear-gradient(135deg, var(--grad-purple-from) 0%, var(--grad-purple-to) 100%);
+  color: #fff;
+  box-shadow: 0 4rpx 16rpx rgba(168, 85, 247, 0.3);
+}
+
+.rank-3 {
+  background: linear-gradient(135deg, var(--grad-blue-from) 0%, var(--grad-blue-to) 100%);
+  color: #fff;
+  box-shadow: 0 4rpx 16rpx rgba(59, 130, 246, 0.3);
+}
+
+.rank-normal {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  border: 1rpx solid rgba(255, 255, 255, 0.08);
+}
+
+/* ========== 来源标签 ========== */
+.source-badge {
+  font-size: 20rpx;
+  padding: 6rpx 16rpx;
+  border-radius: var(--radius-pill);
+  font-weight: bold;
+  display: inline-block;
+}
+
+.source-badge-artificial-analysis,
+.source-badge.source-artificial-analysis {
+  background: var(--source-aa-bg);
+  color: var(--source-aa);
+}
+
+.source-badge-arena,
+.source-badge.source-arena {
+  background: var(--source-arena-bg);
+  color: var(--source-arena);
+}
+
+.source-badge-huggingface,
+.source-badge.source-huggingface {
+  background: var(--source-hf-bg);
+  color: var(--source-hf);
+}
+
+/* ========== 通用文字 ========== */
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-accent { color: var(--accent); }
+
+.source-color-artificial-analysis { color: var(--source-aa); }
+.source-color-arena { color: var(--source-arena); }
+.source-color-huggingface { color: var(--source-hf); }
+
+/* ========== 通用布局 ========== */
+.loading {
+  text-align: center;
+  padding: 100rpx 0;
+  color: var(--text-secondary);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 100rpx 0;
+}
+
+.empty-icon {
+  font-size: 80rpx;
+  display: block;
+  margin-bottom: 24rpx;
+}
+
+.empty-text {
+  font-size: 30rpx;
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.empty-hint {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+}
+
+/* ========== 返回按钮 ========== */
+.btn-back {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1rpx solid rgba(255, 255, 255, 0.1);
+  color: var(--accent);
+  border-radius: var(--radius-md);
+  padding: 24rpx;
+  font-size: 28rpx;
+  width: 100%;
+  box-sizing: border-box;
+}

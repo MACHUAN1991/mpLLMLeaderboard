@@ -1,32 +1,26 @@
 /* pages/history/history.wxss */
-.container {
-  min-height: 100vh;
-  padding: 40rpx;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  box-sizing: border-box;
-}
 
 .header {
-  margin-bottom: 40rpx;
+  margin-bottom: 36rpx;
 }
 
 .title {
   font-size: 40rpx;
   font-weight: bold;
-  color: #fff;
+  color: var(--text-primary);
   display: block;
 }
 
 .subtitle {
   font-size: 24rpx;
-  color: #8892b0;
+  color: var(--text-secondary);
   margin-top: 8rpx;
 }
 
 .loading {
   text-align: center;
   padding: 100rpx 0;
-  color: #8892b0;
+  color: var(--text-secondary);
 }
 
 .empty-state {
@@ -42,79 +36,83 @@
 
 .empty-text {
   font-size: 32rpx;
-  color: #fff;
+  color: var(--text-primary);
   display: block;
   margin-bottom: 16rpx;
 }
 
 .empty-hint {
   font-size: 24rpx;
-  color: #8892b0;
+  color: var(--text-secondary);
 }
 
 .record-list {
   display: flex;
   flex-direction: column;
-  gap: 24rpx;
+  gap: 20rpx;
 }
 
 .record-card {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 20rpx;
-  padding: 30rpx;
-  border: 1rpx solid rgba(100, 255, 218, 0.1);
+  border-radius: var(--radius-xl);
+  padding: 28rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24rpx;
-  padding-bottom: 20rpx;
+  margin-bottom: 20rpx;
+  padding-bottom: 16rpx;
   border-bottom: 1rpx solid rgba(255, 255, 255, 0.05);
 }
 
 .card-date {
   font-size: 28rpx;
   font-weight: bold;
-  color: #64ffda;
+  color: var(--accent);
 }
 
 .card-count {
   font-size: 22rpx;
-  color: #8892b0;
-  background: rgba(100, 255, 218, 0.1);
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.06);
   padding: 6rpx 16rpx;
-  border-radius: 20rpx;
+  border-radius: var(--radius-pill);
 }
 
 .top3-preview {
   display: flex;
-  gap: 16rpx;
-  margin-bottom: 24rpx;
+  gap: 12rpx;
+  margin-bottom: 20rpx;
 }
 
 .top-item {
   flex: 1;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 12rpx;
+  border-radius: var(--radius-sm);
   padding: 16rpx;
   text-align: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1rpx solid rgba(255, 255, 255, 0.04);
 }
 
 .top-1 {
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 215, 0, 0.05) 100%);
-  border: 1rpx solid rgba(255, 215, 0, 0.3);
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 140, 0, 0.05) 100%);
+  border: 1rpx solid rgba(255, 215, 0, 0.25);
+  box-shadow: 0 4rpx 20rpx rgba(255, 215, 0, 0.08);
 }
 
 .top-2 {
-  background: linear-gradient(135deg, rgba(192, 192, 192, 0.2) 0%, rgba(192, 192, 192, 0.05) 100%);
-  border: 1rpx solid rgba(192, 192, 192, 0.3);
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.12) 0%, rgba(124, 58, 237, 0.04) 100%);
+  border: 1rpx solid rgba(168, 85, 247, 0.2);
+  box-shadow: 0 4rpx 20rpx rgba(168, 85, 247, 0.06);
 }
 
 .top-3 {
-  background: linear-gradient(135deg, rgba(205, 127, 50, 0.2) 0%, rgba(205, 127, 50, 0.05) 100%);
-  border: 1rpx solid rgba(205, 127, 50, 0.3);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(6, 182, 212, 0.04) 100%);
+  border: 1rpx solid rgba(59, 130, 246, 0.2);
+  box-shadow: 0 4rpx 20rpx rgba(59, 130, 246, 0.06);
 }
 
 .top-rank {
@@ -124,13 +122,27 @@
   margin-bottom: 8rpx;
 }
 
-.top-1 .top-rank { color: #ffd700; }
-.top-2 .top-rank { color: #c0c0c0; }
-.top-3 .top-rank { color: #cd7f32; }
+.top-1 .top-rank {
+  background: linear-gradient(135deg, var(--grad-gold-from) 0%, var(--grad-gold-to) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.top-2 .top-rank {
+  background: linear-gradient(135deg, var(--grad-purple-from) 0%, var(--grad-purple-to) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.top-3 .top-rank {
+  background: linear-gradient(135deg, var(--grad-blue-from) 0%, var(--grad-blue-to) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 
 .top-name {
   font-size: 22rpx;
-  color: #fff;
+  color: var(--text-primary);
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -140,7 +152,7 @@
 
 .top-org {
   font-size: 18rpx;
-  color: #8892b0;
+  color: var(--text-secondary);
   display: block;
 }
 
@@ -152,13 +164,14 @@
 
 .card-time {
   font-size: 20rpx;
-  color: #8892b0;
+  color: var(--text-tertiary);
 }
 
 .delete-btn {
   font-size: 22rpx;
-  color: #ff5252;
+  color: var(--danger);
   padding: 8rpx 20rpx;
-  border: 1rpx solid #ff5252;
-  border-radius: 8rpx;
+  border: 1rpx solid rgba(255, 82, 82, 0.25);
+  border-radius: var(--radius-pill);
+  background: rgba(255, 82, 82, 0.06);
 }

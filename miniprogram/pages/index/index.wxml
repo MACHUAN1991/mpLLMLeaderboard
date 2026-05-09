@@ -1,4 +1,4 @@
-<view class="container">
+<view class="container container-{{currentSource}}">
   <view class="header-row">
     <view class="source-tabs">
       <view class="source-tab {{currentSource === 'artificial-analysis' ? 'active active-aa' : ''}}" data-source="artificial-analysis" bindtap="switchSource">Artificial Analysis</view>
@@ -40,13 +40,13 @@
     <view wx:if="{{rankingsLoading}}" class="loading">
       <text>加载排名中...</text>
     </view>
-    <view wx:elif="{{latestRecord}}" class="ranking-container">
+    <view wx:elif="{{latestRecord}}" class="ranking-container {{currentSource === 'artificial-analysis' ? 'gradient-card-purple' : currentSource === 'arena' ? 'gradient-card-amber' : 'gradient-card-blue'}}">
       <view class="ranking-header">
         <text class="ranking-date source-color-{{currentSource}}">{{latestRecord.date}}</text>
         <text class="ranking-count">共 {{latestRecord.totalModels}} 个模型</text>
       </view>
       <view class="ranking-list">
-        <view wx:for="{{latestRankings}}" wx:key="rank" class="ranking-card">
+        <view wx:for="{{latestRankings}}" wx:key="rank" class="ranking-card {{item.rank === 1 ? 'gradient-card-gold' : item.rank === 2 ? 'gradient-card-purple' : item.rank === 3 ? 'gradient-card-blue' : 'gradient-card-normal'}}">
           <view class="ranking-card-header">
             <view class="rank-badge rank-{{item.rank <= 3 ? item.rank : 'normal'}}">{{item.rank}}</view>
             <view class="ranking-model-info">

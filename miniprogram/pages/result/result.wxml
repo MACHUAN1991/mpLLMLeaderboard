@@ -1,4 +1,4 @@
-<view class="container">
+<view class="container container-{{source}}">
   <view class="header">
     <view class="header-top">
       <text class="title">排行榜</text>

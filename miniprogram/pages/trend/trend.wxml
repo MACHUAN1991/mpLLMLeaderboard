@@ -1,4 +1,4 @@
-<view class="container">
+<view class="container container-{{source}}">
   <view class="header">
     <text class="title">排名趋势</text>
     <text class="subtitle subtitle-{{source}}" wx:if="{{source === 'artificial-analysis'}}">Artificial Analysis 近14天排名变化</text>
@@ -42,7 +42,7 @@
       </view>
 
       <!-- 每个模型一张卡片 -->
-      <view wx:for="{{tableData}}" wx:key="name" class="model-card" bindtap="toggleCard" data-index="{{index}}">
+      <view wx:for="{{tableData}}" wx:key="name" class="model-card {{item.currentRank === 1 ? 'card-gold' : item.currentRank === 2 ? 'card-purple' : item.currentRank === 3 ? 'card-blue' : 'card-normal'}}" bindtap="toggleCard" data-index="{{index}}">
         <view class="model-header">
           <view class="model-rank-badge rank-badge-{{item.currentRank <= 3 ? item.currentRank : 'normal'}}">
             <text>#{{item.currentRank}}</text>

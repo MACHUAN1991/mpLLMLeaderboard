@@ -1,40 +1,26 @@
 /* pages/trend/trend.wxss */
-.container {
-  min-height: 100vh;
-  padding: 30rpx;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  box-sizing: border-box;
-}
 
 .header {
-  margin-bottom: 30rpx;
+  margin-bottom: 24rpx;
 }
 
 .title {
   display: block;
   font-size: 36rpx;
   font-weight: bold;
-  color: #fff;
+  color: var(--text-primary);
   margin-bottom: 8rpx;
 }
 
 .subtitle {
   display: block;
   font-size: 24rpx;
-  color: #8892b0;
+  color: var(--text-secondary);
 }
 
-.subtitle-artificial-analysis {
-  color: #9575cd;
-}
-
-.subtitle-arena {
-  color: #c9a96e;
-}
-
-.subtitle-huggingface {
-  color: #7fb3d3;
-}
+.subtitle-artificial-analysis { color: var(--source-aa); }
+.subtitle-arena { color: var(--source-arena); }
+.subtitle-huggingface { color: var(--source-hf); }
 
 .loading, .empty-state {
   display: flex;
@@ -45,7 +31,7 @@
 }
 
 .loading text {
-  color: #8892b0;
+  color: var(--text-secondary);
   font-size: 28rpx;
 }
 
@@ -56,27 +42,28 @@
 
 .empty-text {
   font-size: 28rpx;
-  color: #8892b0;
+  color: var(--text-primary);
   margin-bottom: 10rpx;
 }
 
 .empty-hint {
   font-size: 22rpx;
-  color: #5a6380;
+  color: var(--text-tertiary);
 }
 
 /* 折线图区域 */
 .chart-section {
+  border-radius: var(--radius-xl);
+  padding: 28rpx;
+  margin-bottom: 24rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.06);
   background: rgba(255, 255, 255, 0.03);
-  border-radius: 20rpx;
-  padding: 24rpx;
-  margin-bottom: 30rpx;
 }
 
 .section-title {
   display: block;
   font-size: 28rpx;
-  color: #8892b0;
+  color: var(--text-secondary);
   font-weight: bold;
 }
 
@@ -89,13 +76,13 @@
 
 .section-hint {
   font-size: 20rpx;
-  color: #8892b0;
+  color: var(--text-tertiary);
 }
 
 .trend-canvas {
   width: 100%;
-  border-radius: 12rpx;
-  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-sm);
+  background: rgba(0, 0, 0, 0.25);
 }
 
 /* 图例容器 */
@@ -104,9 +91,10 @@
   flex-wrap: wrap;
   gap: 16rpx;
   margin-top: 16rpx;
-  padding: 12rpx;
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 12rpx;
+  padding: 14rpx;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-sm);
+  border: 1rpx solid rgba(255, 255, 255, 0.04);
 }
 
 .legend-item {
@@ -124,25 +112,47 @@
 
 .legend-text {
   font-size: 20rpx;
-  color: #8892b0;
+  color: var(--text-secondary);
   white-space: nowrap;
 }
 
 /* 表格区域 */
 .table-section {
+  border-radius: var(--radius-xl);
+  padding: 28rpx;
+  margin-bottom: 24rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.06);
   background: rgba(255, 255, 255, 0.03);
-  border-radius: 20rpx;
-  padding: 24rpx;
-  margin-bottom: 30rpx;
 }
 
 /* 模型卡片 */
 .model-card {
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 16rpx;
-  padding: 20rpx;
+  border-radius: var(--radius-md);
+  padding: 24rpx;
   margin-bottom: 16rpx;
-  border: 1rpx solid rgba(255, 255, 255, 0.05);
+  border: 1rpx solid rgba(255, 255, 255, 0.06);
+}
+
+.model-card.card-gold {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.12) 0%, rgba(255, 140, 0, 0.04) 100%);
+  border-color: rgba(255, 215, 0, 0.2);
+  box-shadow: 0 4rpx 20rpx rgba(255, 215, 0, 0.08);
+}
+
+.model-card.card-purple {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(124, 58, 237, 0.03) 100%);
+  border-color: rgba(168, 85, 247, 0.18);
+  box-shadow: 0 4rpx 20rpx rgba(168, 85, 247, 0.06);
+}
+
+.model-card.card-blue {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(6, 182, 212, 0.03) 100%);
+  border-color: rgba(59, 130, 246, 0.18);
+  box-shadow: 0 4rpx 20rpx rgba(59, 130, 246, 0.06);
+}
+
+.model-card.card-normal {
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .model-card:last-child {
@@ -158,7 +168,7 @@
 .model-rank-badge {
   width: 56rpx;
   height: 56rpx;
-  border-radius: 12rpx;
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -168,24 +178,27 @@
 }
 
 .rank-badge-1 {
-  background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+  background: linear-gradient(135deg, var(--grad-gold-from) 0%, var(--grad-gold-to) 100%);
   color: #1a1a2e;
+  box-shadow: 0 4rpx 16rpx rgba(255, 215, 0, 0.3);
 }
 
 .rank-badge-2 {
-  background: linear-gradient(135deg, #c0c0c0 0%, #a0a0a0 100%);
-  color: #1a1a2e;
+  background: linear-gradient(135deg, var(--grad-purple-from) 0%, var(--grad-purple-to) 100%);
+  color: #fff;
+  box-shadow: 0 4rpx 16rpx rgba(168, 85, 247, 0.3);
 }
 
 .rank-badge-3 {
-  background: linear-gradient(135deg, #cd7f32 0%, #a05a20 100%);
+  background: linear-gradient(135deg, var(--grad-blue-from) 0%, var(--grad-blue-to) 100%);
   color: #fff;
+  box-shadow: 0 4rpx 16rpx rgba(59, 130, 246, 0.3);
 }
 
 .rank-badge-normal {
-  background: rgba(100, 255, 218, 0.1);
-  color: #64ffda;
-  border: 1rpx solid rgba(100, 255, 218, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  border: 1rpx solid rgba(255, 255, 255, 0.08);
 }
 
 .model-info {
@@ -196,7 +209,7 @@
 .model-name {
   display: block;
   font-size: 26rpx;
-  color: #fff;
+  color: var(--text-primary);
   font-weight: bold;
   white-space: nowrap;
   overflow: hidden;
@@ -206,33 +219,33 @@
 .model-org {
   display: block;
   font-size: 20rpx;
-  color: #8892b0;
+  color: var(--text-secondary);
   margin-top: 4rpx;
 }
 
 .change-badge {
   padding: 6rpx 16rpx;
-  border-radius: 20rpx;
+  border-radius: var(--radius-pill);
   font-size: 24rpx;
   font-weight: bold;
 }
 
 .change-badge.rise {
-  background: rgba(100, 255, 218, 0.15);
-  color: #64ffda;
-  border: 1rpx solid rgba(100, 255, 218, 0.3);
+  background: linear-gradient(135deg, rgba(100, 255, 218, 0.15) 0%, rgba(6, 182, 212, 0.08) 100%);
+  color: var(--accent);
+  border: 1rpx solid rgba(100, 255, 218, 0.2);
 }
 
 .change-badge.fall {
-  background: rgba(255, 107, 107, 0.15);
-  color: #ff6b6b;
-  border: 1rpx solid rgba(255, 107, 107, 0.3);
+  background: linear-gradient(135deg, rgba(255, 82, 82, 0.15) 0%, rgba(244, 63, 94, 0.08) 100%);
+  color: var(--danger);
+  border: 1rpx solid rgba(255, 82, 82, 0.2);
 }
 
 .change-badge.same {
-  background: rgba(136, 146, 176, 0.15);
-  color: #8892b0;
-  border: 1rpx solid rgba(136, 146, 176, 0.3);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  border: 1rpx solid rgba(255, 255, 255, 0.06);
 }
 
 /* 时间线 */
@@ -267,42 +280,36 @@
 }
 
 .point-rank.rank-1 {
-  background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+  background: linear-gradient(135deg, var(--grad-gold-from) 0%, var(--grad-gold-to) 100%);
   color: #1a1a2e;
+  box-shadow: 0 0 12rpx rgba(255, 215, 0, 0.3);
 }
 
 .point-rank.rank-2 {
-  background: linear-gradient(135deg, #c0c0c0 0%, #a0a0a0 100%);
-  color: #1a1a2e;
+  background: linear-gradient(135deg, var(--grad-purple-from) 0%, var(--grad-purple-to) 100%);
+  color: #fff;
+  box-shadow: 0 0 12rpx rgba(168, 85, 247, 0.3);
 }
 
 .point-rank.rank-3 {
-  background: linear-gradient(135deg, #cd7f32 0%, #a05a20 100%);
+  background: linear-gradient(135deg, var(--grad-blue-from) 0%, var(--grad-blue-to) 100%);
   color: #fff;
+  box-shadow: 0 0 12rpx rgba(59, 130, 246, 0.3);
 }
 
 .point-rank.rank-normal {
-  background: rgba(100, 255, 218, 0.1);
-  color: #64ffda;
-  border: 1rpx solid rgba(100, 255, 218, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  border: 1rpx solid rgba(255, 255, 255, 0.08);
 }
 
 .point-date {
   font-size: 18rpx;
-  color: #8892b0;
+  color: var(--text-secondary);
 }
 
 .point-score {
   font-size: 16rpx;
-  color: #64ffda;
+  color: var(--accent);
   margin-top: 4rpx;
-}
-
-.btn-back {
-  background: transparent;
-  border: 2rpx solid #64ffda;
-  color: #64ffda;
-  border-radius: 12rpx;
-  padding: 24rpx;
-  font-size: 28rpx;
 }
