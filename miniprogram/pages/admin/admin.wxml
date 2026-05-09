@@ -3,50 +3,80 @@
     <text class="title">管理员页面</text>
   </view>
 
-  <view class="source-selector">
-    <text class="selector-label">选择排名来源：</text>
-    <view class="source-tabs">
-      <view class="source-tab {{source === 'arena' ? 'active' : ''}}" data-source="arena" bindtap="selectSource">Arena</view>
-      <view class="source-tab {{source === 'artificial-analysis' ? 'active' : ''}}" data-source="artificial-analysis" bindtap="selectSource">Artificial Analysis</view>
-      <view class="source-tab {{source === 'huggingface' ? 'active' : ''}}" data-source="huggingface" bindtap="selectSource">Hugging Face</view>
+  <!-- 图片网格 -->
+  <view class="upload-area">
+    <view wx:if="{{imageList.length > 0}}" class="image-grid">
+      <view wx:for="{{imageList}}" wx:key="path" class="image-item">
+        <image src="{{item.path}}" mode="aspectFill" class="image-thumb" />
+        <view class="image-remove" data-index="{{index}}" catchtap="removeImage">×</view>
+        <view class="image-labels" catchtap="openPicker" data-index="{{index}}">
+          <text class="image-source-badge source-badge-{{item.source}}">{{item.source === 'huggingface' ? 'HF' : item.source === 'artificial-analysis' ? 'AA' : 'Arena'}}</text>
+          <text wx:if="{{item.source === 'arena' && item.subCategory}}" class="image-sub-badge">{{item.subCategory}}</text>
+          <text wx:if="{{item.source === 'arena' && !item.subCategory}}" class="image-sub-badge image-sub-required">?</text>
+        </view>
+      </view>
+      <view wx:if="{{imageList.length < 30}}" class="image-item image-add" bindtap="chooseImage">
+        <text class="add-icon">+</text>
+      </view>
     </view>
-  </view>
-
-  <!-- Arena子分类 -->
-  <view wx:if="{{source === 'arena'}}" class="sub-category-selector">
-    <text class="selector-label">选择子分类：</text>
-    <scroll-view scroll-x class="sub-category-tabs">
-      <view wx:for="{{arenaSubCategories}}" wx:key="key" class="sub-category-tab {{currentSubCategory === item.key ? 'active' : ''}}" data-key="{{item.key}}" bindtap="switchSubCategory">{{item.label}}</view>
-    </scroll-view>
-  </view>
-
-  <view class="upload-area" bindtap="chooseImage">
-    <image wx:if="{{imagePath}}" src="{{imagePath}}" mode="aspectFit" class="preview-image" />
-    <view wx:else class="upload-placeholder">
+    <view wx:else class="upload-placeholder" bindtap="chooseImage">
       <text class="icon">📷</text>
       <text class="text">点击选择截图</text>
+      <text class="hint">支持多次选择（最多30张）</text>
     </view>
+  </view>
+
+  <!-- 来源+子分类选择弹窗 -->
+  <view wx:if="{{showPickerIndex >= 0}}" class="picker-mask" bindtap="closePicker">
+    <view class="picker-content" catchtap="">
+      <view class="picker-title">设置图片属性</view>
+
+      <view class="picker-section-title">来源</view>
+      <view class="picker-options">
+        <view wx:for="{{sources}}" wx:key="key" class="picker-option {{imageList[showPickerIndex].source === item.key ? 'active' : ''}}" data-key="{{item.key}}" bindtap="pickSource">{{item.label}}</view>
+      </view>
+
+      <view wx:if="{{imageList[showPickerIndex].source === 'arena'}}">
+        <view class="picker-section-title">子分类（必选）</view>
+        <view class="picker-options">
+          <view wx:for="{{arenaSubCategories}}" wx:key="key" class="picker-option {{imageList[showPickerIndex].subCategory === item.key ? 'active' : ''}}" data-key="{{item.key}}" bindtap="pickSubCategory">{{item.label}}</view>
+        </view>
+      </view>
+
+      <view wx:else class="picker-done-row">
+        <view class="picker-done-btn" bindtap="closePicker">确定</view>
+      </view>
+
+      <view class="picker-cancel" bindtap="closePicker">取消</view>
+    </view>
+  </view>
+
+  <!-- 进度 -->
+  <view wx:if="{{analyzing}}" class="batch-progress">
+    <text>{{analyzingStep}}</text>
+    <view class="progress-bar">
+      <view class="progress-fill" style="width: {{batchProgress.total > 0 ? (batchProgress.current / batchProgress.total * 100) : 0}}%"></view>
+    </view>
+    <text class="progress-text">{{batchProgress.current}} / {{batchProgress.total}}</text>
   </view>
 
   <view class="actions">
-    <button wx:if="{{!imagePath}}" class="btn-primary" bindtap="chooseImage">选择图片</button>
-    <button wx:if="{{imagePath && !analyzing}}" class="btn-primary" bindtap="uploadAndAnalyze">开始解析</button>
-    <button wx:if="{{analyzing}}" class="btn-primary" loading>
+    <button wx:if="{{imageList.length > 0 && !analyzing}}" class="btn-primary" bindtap="uploadAndAnalyze">开始解析（{{imageList.length}}张）</button>
+    <button wx:if="{{analyzing}}" class="btn-primary" loading disabled>
       {{analyzingStep || '解析中...'}}
     </button>
   </view>
 
-  <view wx:if="{{result}}" class="result-preview">
-    <view class="result-header">
-      <text class="result-title">解析结果</text>
-      <text class="result-date">{{result.date || result.Date}}</text>
+  <!-- 批量结果汇总 -->
+  <view wx:if="{{batchResults}}" class="batch-summary">
+    <view class="summary-row">
+      <text class="summary-success">成功 {{batchResults.success}} 张</text>
+      <text wx:if="{{batchResults.fail > 0}}" class="summary-fail">失败 {{batchResults.fail}} 张</text>
     </view>
-    <view class="result-summary">
-      <text class="summary-item">共 {{result.rankings.length || 0}} 个模型</text>
+    <view wx:if="{{batchResults.errors.length > 0}}" class="error-list">
+      <text wx:for="{{batchResults.errors}}" wx:key="*this" class="error-item">{{item}}</text>
     </view>
-    <view class="result-actions">
-      <button class="btn-secondary" bindtap="clearResult">继续上传</button>
-    </view>
+    <button class="btn-secondary" bindtap="clearResult">继续上传</button>
   </view>
 
   <view wx:if="{{error}}" class="error-tip">
@@ -55,17 +85,27 @@
 
   <!-- 记录列表 -->
   <view class="records-section">
-    <view class="section-title">历史记录</view>
+    <view class="section-header">
+      <view class="section-title">历史记录</view>
+      <text wx:if="{{records.length > 0 && !deleteMode}}" class="batch-delete-toggle" bindtap="toggleDeleteMode">批量删除</text>
+    </view>
+    <view wx:if="{{deleteMode}}" class="batch-delete-bar">
+      <text class="select-all-text" bindtap="toggleSelectAll">{{selectedCount === records.length ? '取消全选' : '全选'}}</text>
+      <text class="batch-delete-btn" bindtap="deleteSelected">删除选中（{{selectedCount}}）</text>
+    </view>
     <view wx:if="{{loadingRecords}}" class="loading-text">加载中...</view>
     <view wx:elif="{{records.length === 0}}" class="empty-text">暂无记录</view>
     <view wx:else class="record-list">
       <view wx:for="{{records}}" wx:key="recordId" class="record-item">
+        <view wx:if="{{deleteMode}}" class="record-checkbox {{selectedRecords[item.recordId] ? 'checked' : ''}}" data-id="{{item.recordId}}" bindtap="toggleSelectRecord">
+          <text wx:if="{{selectedRecords[item.recordId]}}">✓</text>
+        </view>
         <view class="record-info">
           <view class="record-source source-{{item.source}}">{{item.source === 'huggingface' ? 'HF' : item.source === 'artificial-analysis' ? 'AA' : 'Arena'}}{{item.subCategory ? ' - ' + item.subCategory : ''}}</view>
           <text class="record-date">{{item.date}}</text>
           <text class="record-count">{{item.totalModels}} 个模型</text>
         </view>
-        <text class="delete-btn" data-recordid="{{item.recordId}}" data-date="{{item.date}}" catchtap="deleteRecord">删除</text>
+        <text wx:if="{{!deleteMode}}" class="delete-btn" data-recordid="{{item.recordId}}" data-date="{{item.date}}" catchtap="deleteRecord">删除</text>
       </view>
     </view>
   </view>

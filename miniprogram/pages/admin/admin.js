@@ -1,12 +1,13 @@
 // pages/admin/admin.js
 Page({
   data: {
-    imagePath: '',
+    imageList: [],
     analyzing: false,
     result: null,
     error: null,
     analyzingStep: '',
-    source: 'arena',
+    batchProgress: { current: 0, total: 0 },
+    batchResults: null,
     arenaSubCategories: [
       { key: 'text', label: 'Text' },
       { key: 'search', label: 'Search' },
@@ -18,22 +19,27 @@ Page({
       { key: 'text-to-video', label: 'Text-to-Video' },
       { key: 'image-to-video', label: 'Image-to-Video' }
     ],
-    currentSubCategory: 'text',
+    sources: [
+      { key: 'arena', label: 'Arena' },
+      { key: 'artificial-analysis', label: 'AA' },
+      { key: 'huggingface', label: 'HF' }
+    ],
+    showPickerIndex: -1,
+    deleteMode: false,
+    selectedRecords: {},
+    selectedCount: 0,
     records: [],
     loadingRecords: false
   },
 
   onLoad: function () {
-    // 导航到管理页前已在首页验证密码，此处直接加载记录
     this.loadRecords();
   },
 
   onUnload: function () {
-    // 离开管理页时清除管理员状态，避免删除按钮一直显示
     wx.removeStorageSync('adminAuthorized');
   },
 
-  // 显示登录对话框
   showLoginDialog: function () {
     wx.showModal({
       title: '管理权限验证',
@@ -41,15 +47,13 @@ Page({
       editable: true,
       success: (res) => {
         if (res.confirm && res.content) {
-          if (res.content === 'admin123') {  // 密码：admin123
+          if (res.content === 'admin123') {
             wx.setStorageSync('adminAuthorized', true);
             wx.showToast({ title: '验证成功', icon: 'success' });
             this.loadRecords();
           } else {
             wx.showToast({ title: '密码错误', icon: 'none' });
-            setTimeout(() => {
-              wx.navigateBack();
-            }, 1500);
+            setTimeout(() => { wx.navigateBack(); }, 1500);
           }
         } else {
           wx.navigateBack();
@@ -58,7 +62,6 @@ Page({
     });
   },
 
-  // 加载记录列表
   loadRecords: function () {
     this.setData({ loadingRecords: true });
     wx.cloud.callFunction({
@@ -66,21 +69,15 @@ Page({
       data: { page: 1, pageSize: 50 },
       success: (res) => {
         if (res.result.success) {
-          this.setData({
-            records: res.result.data || [],
-            loadingRecords: false
-          });
+          this.setData({ records: res.result.data || [], loadingRecords: false });
         } else {
           this.setData({ loadingRecords: false });
         }
       },
-      fail: () => {
-        this.setData({ loadingRecords: false });
-      }
+      fail: () => { this.setData({ loadingRecords: false }); }
     });
   },
 
-  // 删除记录
   deleteRecord: function (e) {
     const { recordid, date } = e.currentTarget.dataset;
     wx.showModal({
@@ -111,179 +108,301 @@ Page({
     });
   },
 
-  // 选择排名来源
-  selectSource: function (e) {
-    const source = e.currentTarget.dataset.source;
-    this.setData({ source });
+  // 切换删除模式
+  toggleDeleteMode: function () {
+    this.setData({
+      deleteMode: !this.data.deleteMode,
+      selectedRecords: {},
+      selectedCount: 0
+    });
   },
 
-  // 选择Arena子分类
-  switchSubCategory: function (e) {
-    const key = e.currentTarget.dataset.key;
-    this.setData({ currentSubCategory: key });
+  // 选中/取消单条记录
+  toggleSelectRecord: function (e) {
+    const id = e.currentTarget.dataset.id;
+    const selected = { ...this.data.selectedRecords };
+    if (selected[id]) {
+      delete selected[id];
+    } else {
+      selected[id] = true;
+    }
+    this.setData({
+      selectedRecords: selected,
+      selectedCount: Object.keys(selected).length
+    });
   },
 
-  // 选择图片
+  // 全选/取消全选
+  toggleSelectAll: function () {
+    const { records, selectedRecords } = this.data;
+    if (Object.keys(selectedRecords).length === records.length) {
+      this.setData({ selectedRecords: {}, selectedCount: 0 });
+    } else {
+      const all = {};
+      records.forEach(r => { all[r.recordId] = true; });
+      this.setData({ selectedRecords: all, selectedCount: records.length });
+    }
+  },
+
+  // 批量删除选中记录
+  deleteSelected: function () {
+    const { selectedRecords, selectedCount } = this.data;
+    if (selectedCount === 0) {
+      wx.showToast({ title: '请先选择记录', icon: 'none' });
+      return;
+    }
+    wx.showModal({
+      title: '确认批量删除',
+      content: `确定要删除选中的 ${selectedCount} 条记录吗？`,
+      success: (res) => {
+        if (res.confirm) {
+          wx.showLoading({ title: '删除中...' });
+          const ids = Object.keys(selectedRecords);
+          let done = 0;
+          let failed = 0;
+          ids.forEach(id => {
+            wx.cloud.callFunction({
+              name: 'deleteRecord',
+              data: { recordId: id },
+              success: () => {
+                done++;
+                if (done + failed === ids.length) {
+                  wx.hideLoading();
+                  wx.showToast({ title: `删除${failed > 0 ? `完成，${failed}条失败` : '成功'}`, icon: failed > 0 ? 'none' : 'success' });
+                  this.setData({ deleteMode: false, selectedRecords: {}, selectedCount: 0 });
+                  this.loadRecords();
+                }
+              },
+              fail: () => {
+                failed++;
+                if (done + failed === ids.length) {
+                  wx.hideLoading();
+                  wx.showToast({ title: `删除完成，${failed}条失败`, icon: 'none' });
+                  this.setData({ deleteMode: false, selectedRecords: {}, selectedCount: 0 });
+                  this.loadRecords();
+                }
+              }
+            });
+          });
+        }
+      }
+    });
+  },
+
+  MAX_IMAGES: 30,
+
   chooseImage: function () {
+    const remaining = this.MAX_IMAGES - this.data.imageList.length;
+    if (remaining <= 0) {
+      wx.showToast({ title: '最多选择30张图片', icon: 'none' });
+      return;
+    }
     wx.chooseImage({
-      count: 1,
+      count: Math.min(remaining, 9),
       sizeType: ['compressed'],
       sourceType: ['album', 'camera'],
       success: (res) => {
-        const tempFilePath = res.tempFilePaths[0];
-        this.setData({ imagePath: tempFilePath, error: null, result: null });
+        const newImages = res.tempFilePaths.map(path => ({
+          path,
+          source: 'arena',
+          subCategory: ''
+        }));
+        this.setData({
+          imageList: this.data.imageList.concat(newImages),
+          error: null,
+          result: null,
+          batchResults: null
+        });
       },
-      fail: (err) => {
+      fail: () => {
         wx.showToast({ title: '选择图片失败', icon: 'none' });
       }
     });
   },
 
-  // 获取文件大小
+  removeImage: function (e) {
+    const idx = e.currentTarget.dataset.index;
+    const list = this.data.imageList.slice();
+    list.splice(idx, 1);
+    this.setData({ imageList: list, showPickerIndex: -1 });
+  },
+
+  openPicker: function (e) {
+    const idx = e.currentTarget.dataset.index;
+    this.setData({ showPickerIndex: idx });
+  },
+
+  closePicker: function () {
+    this.setData({ showPickerIndex: -1 });
+  },
+
+  // 选择来源
+  pickSource: function (e) {
+    const key = e.currentTarget.dataset.key;
+    const idx = this.data.showPickerIndex;
+    if (idx < 0) return;
+    const list = this.data.imageList.slice();
+    list[idx] = { ...list[idx], source: key, subCategory: '' };
+    this.setData({ imageList: list });
+  },
+
+  // 选择子分类
+  pickSubCategory: function (e) {
+    const key = e.currentTarget.dataset.key;
+    const idx = this.data.showPickerIndex;
+    if (idx < 0) return;
+    const list = this.data.imageList.slice();
+    list[idx] = { ...list[idx], subCategory: key };
+    this.setData({ imageList: list, showPickerIndex: -1 });
+  },
+
+  getSourceLabel: function (key) {
+    const s = this.data.sources.find(s => s.key === key);
+    return s ? s.label : key;
+  },
+
+  getSubCategoryLabel: function (key) {
+    const cat = this.data.arenaSubCategories.find(c => c.key === key);
+    return cat ? cat.label : key;
+  },
+
   getFileSize: function (filePath) {
     return new Promise((resolve, reject) => {
       wx.getFileSystemManager().getFileInfo({
-        filePath: filePath,
+        filePath,
         success: (res) => resolve(res.size),
         fail: (err) => reject(err)
       });
     });
   },
 
-  // 上传并分析
   uploadAndAnalyze: async function () {
-    if (!this.data.imagePath) {
+    const { imageList } = this.data;
+    if (imageList.length === 0) {
       wx.showToast({ title: '请先选择图片', icon: 'none' });
       return;
     }
 
-    this.setData({ analyzing: true, error: null, analyzingStep: '' });
+    // 校验：Arena 来源必须选子分类
+    for (let i = 0; i < imageList.length; i++) {
+      const img = imageList[i];
+      if (img.source === 'arena' && !img.subCategory) {
+        wx.showToast({ title: `第${i + 1}张：Arena需选子分类`, icon: 'none' });
+        return;
+      }
+    }
 
-    let fileID = null;
+    const total = imageList.length;
+    this.setData({
+      analyzing: true,
+      error: null,
+      result: null,
+      batchResults: null,
+      batchProgress: { current: 0, total },
+      showPickerIndex: -1
+    });
 
-    try {
-      let filePath = this.data.imagePath;
+    let successCount = 0;
+    let failCount = 0;
+    const errors = [];
 
-      // 1. 压缩图片
+    for (let i = 0; i < total; i++) {
+      const { path: filePath, source, subCategory } = imageList[i];
+      let fileID = null;
+
       try {
-        const fileSize = await this.getFileSize(this.data.imagePath);
-        console.log('原图大小:', fileSize);
-        if (fileSize > 100 * 1024) {
-          this.setData({ analyzingStep: '压缩图片...' });
-          const compressResult = await wx.compressImage({
-            src: this.data.imagePath,
-            quality: 50
-          });
-          if (compressResult.tempFilePath) {
-            filePath = compressResult.tempFilePath;
-            const newSize = await this.getFileSize(filePath);
-            console.log('压缩后大小:', newSize);
+        this.setData({
+          batchProgress: { current: i + 1, total },
+          analyzingStep: `压缩 ${i + 1}/${total}...`
+        });
+
+        let compressedPath = filePath;
+        try {
+          const fileSize = await this.getFileSize(filePath);
+          if (fileSize > 100 * 1024) {
+            const compressResult = await wx.compressImage({ src: filePath, quality: 50 });
+            if (compressResult.tempFilePath) {
+              compressedPath = compressResult.tempFilePath;
+            }
           }
+        } catch (e) {
+          console.warn('压缩失败:', e);
         }
-      } catch (e) {
-        console.warn('压缩失败:', e);
+
+        this.setData({ analyzingStep: `上传 ${i + 1}/${total}...` });
+        const uploadResult = await wx.cloud.uploadFile({
+          cloudPath: `arena/${Date.now()}_${i}.jpg`,
+          filePath: compressedPath
+        });
+        fileID = uploadResult.fileID;
+
+        this.setData({ analyzingStep: `解析 ${i + 1}/${total}...` });
+        const analyzeResult = await wx.cloud.callFunction({
+          name: 'analyzeImage',
+          data: {
+            fileID,
+            source,
+            subCategory: source === 'arena' ? subCategory : ''
+          },
+          timeout: 120000
+        });
+
+        if (fileID) {
+          wx.cloud.deleteFile({ fileList: [fileID] }).catch(() => {});
+        }
+
+        if (analyzeResult.result.success) {
+          await this.saveToHistory(analyzeResult.result.data, fileID, source, subCategory);
+          successCount++;
+        } else {
+          failCount++;
+          errors.push(`第${i + 1}张: ${analyzeResult.result.error || '解析失败'}`);
+        }
+      } catch (err) {
+        if (fileID) {
+          wx.cloud.deleteFile({ fileList: [fileID] }).catch(() => {});
+        }
+        failCount++;
+        errors.push(`第${i + 1}张: ${err.message || '分析失败'}`);
+        console.error(`第${i + 1}张处理失败:`, err);
       }
+    }
 
-      // 2. 上传图片
-      this.setData({ analyzingStep: '上传中...' });
-      const uploadResult = await wx.cloud.uploadFile({
-        cloudPath: `arena/${Date.now()}.jpg`,
-        filePath: filePath
-      });
-      fileID = uploadResult.fileID;
-      wx.hideLoading();
+    this.setData({
+      analyzing: false,
+      analyzingStep: '',
+      batchResults: { success: successCount, fail: failCount, errors },
+      batchProgress: { current: total, total }
+    });
 
-      // 3. 调用云函数分析（显示进度）
-      this.setData({ analyzingStep: '解析中...' });
+    this.loadRecords();
 
-      const analyzeResult = await wx.cloud.callFunction({
-        name: 'analyzeImage',
-        data: { fileID, source: this.data.source, subCategory: this.data.source === 'arena' ? this.data.currentSubCategory : '' },
-        timeout: 120000  // 120秒超时，云函数内部限制
-      });
-
-      wx.hideLoading();
-
-      // 删除云端图片（无论成功失败都删除）
-      if (fileID) {
-        wx.cloud.deleteFile({
-          fileList: [fileID]
-        }).catch(err => {
-          console.warn('删除图片失败:', err);
-        });
-      }
-
-      if (analyzeResult.result.success) {
-        const resultData = analyzeResult.result.data;
-
-        // 4. 保存到数据库（等待完成）
-        await this.saveToHistory(resultData, fileID);
-
-        // 5. 跳转到 index 页面显示列表
-        wx.reLaunch({
-          url: '/pages/index/index'
-        });
-
-        this.setData({
-          analyzing: false,
-          analyzingStep: '完成',
-          result: resultData
-        });
-
-      } else {
-        this.setData({
-          analyzing: false,
-          error: analyzeResult.result.error || '解析失败'
-        });
-        wx.showToast({ title: '解析失败', icon: 'none' });
-      }
-    } catch (err) {
-      wx.hideLoading();
-
-      // 删除云端图片（如果上传了的话）
-      if (fileID) {
-        wx.cloud.deleteFile({
-          fileList: [fileID]
-        }).catch(e => {
-          console.warn('删除图片失败:', e);
-        });
-      }
-
-      const errorMsg = err.message || err.errMsg || '分析失败';
-      this.setData({
-        analyzing: false,
-        error: errorMsg
-      });
-      wx.showToast({ title: errorMsg, icon: 'none' });
-      console.error(err);
+    if (failCount === 0) {
+      wx.showToast({ title: `${successCount}张全部成功`, icon: 'success' });
+    } else {
+      wx.showToast({ title: `成功${successCount}张，失败${failCount}张`, icon: 'none' });
     }
   },
 
-  // 清除结果
   clearResult: function () {
     this.setData({
-      imagePath: '',
+      imageList: [],
       result: null,
       error: null,
-      analyzingStep: ''
+      batchResults: null,
+      batchProgress: { current: 0, total: 0 },
+      analyzingStep: '',
+      showPickerIndex: -1
     });
   },
 
-  // 保存到历史记录
-  saveToHistory: function (data, fileID) {
-    // analyzeImage 返回的格式是 { Ranking: [...], Date: ... } 或 { rankings: [...], date: ... }
+  saveToHistory: function (data, fileID, source, subCategory) {
     let rankings = [];
-    if (Array.isArray(data.Ranking)) {
-      rankings = data.Ranking;
-    } else if (Array.isArray(data.rankings)) {
-      rankings = data.rankings;
-    } else if (Array.isArray(data.Rankings)) {
-      rankings = data.Rankings;
-    } else if (Array.isArray(data)) {
-      rankings = data;
-    }
-
-    console.log('saveToHistory rankings 数量:', rankings.length);
+    if (Array.isArray(data.Ranking)) rankings = data.Ranking;
+    else if (Array.isArray(data.rankings)) rankings = data.rankings;
+    else if (Array.isArray(data.Rankings)) rankings = data.Rankings;
+    else if (Array.isArray(data.Leaderboard)) rankings = data.Leaderboard;
+    else if (Array.isArray(data)) rankings = data;
 
     const now = new Date();
     const defaultDate = `${now.getFullYear()}.${now.getMonth() + 1}.${now.getDate()}`;
@@ -292,10 +411,10 @@ Page({
       name: 'saveRecord',
       data: {
         date: data.Date || data.date || defaultDate,
-        rankings: rankings,
+        rankings,
         imageFileId: fileID || '',
-        source: this.data.source,
-        subCategory: this.data.source === 'arena' ? this.data.currentSubCategory : ''
+        source,
+        subCategory: source === 'arena' ? subCategory : ''
       }
     });
   }

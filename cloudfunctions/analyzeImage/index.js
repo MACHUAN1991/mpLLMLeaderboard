@@ -230,12 +230,29 @@ exports.main = async (event, context) => {
         Ranking: parsedResult.Models,
         Date: parsedResult.Date || ''
       };
+    } else if (parsedResult?.Leaderboard) {
+      // 对象格式：{Leaderboard: [...], Date: ...} — HF 来源 AI 常返回 Leaderboard
+      normalizedData = {
+        Ranking: parsedResult.Leaderboard,
+        Date: parsedResult.Date || ''
+      };
     } else {
       // 其他格式
       normalizedData = parsedResult;
     }
 
-    // 6. 返回结果
+    // 6. HF来源：去掉模型名前的厂商前缀（如 "moonshotai/Kimi-K2.6" → "Kimi-K2.6"）
+    if (source === 'huggingface' && normalizedData?.Ranking) {
+      normalizedData.Ranking = normalizedData.Ranking.map(item => {
+        const name = item['Model Name'] || item.modelName || item.model_name || '';
+        if (name.includes('/')) {
+          item['Model Name'] = name.split('/').pop();
+        }
+        return item;
+      });
+    }
+
+    // 7. 返回结果
     return {
       success: true,
       data: normalizedData,

@@ -110,6 +110,8 @@ Page({
       rankings = data.Rankings;
     } else if (Array.isArray(data.Models)) {
       rankings = data.Models;
+    } else if (Array.isArray(data.Leaderboard)) {
+      rankings = data.Leaderboard;
     } else if (Array.isArray(data)) {
       rankings = data;
     }
