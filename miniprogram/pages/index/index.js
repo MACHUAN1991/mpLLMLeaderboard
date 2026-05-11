@@ -1,3 +1,5 @@
+const { formatPrice, formatSpeed, formatContextLength } = require('../../utils/formatters');
+
 // pages/index/index.js
 Page({
   data: {
@@ -158,6 +160,7 @@ Page({
   // 处理排名数据（兼容多种字段命名格式）
   processRankings: function (rankings) {
     if (!rankings || !Array.isArray(rankings)) return [];
+    const isAA = this.data.currentSource === 'artificial-analysis';
 
     return rankings.map(item => {
       // 处理字段名兼容性
@@ -165,9 +168,15 @@ Page({
       const modelName = item.modelName || item.model_name || item.Model || item['模型'] || '';
       const organization = item.organization || item.Organization || item['厂商'] || '';
       const score = item.score || item.Score || item['分数'] || item.Elo || '';
-      const price = item.price || item.Price || item['价格'] || '';
-      const speed = item.speed || item.Speed || item['速度'] || '';
-      const contextLength = item.contextLength || item.context_length || item['上下文长度'] || '';
+      let price = item.price || item.Price || item['价格'] || '';
+      let speed = item.speed || item.Speed || item['速度'] || '';
+      let contextLength = item.contextLength || item.context_length || item['上下文长度'] || '';
+
+      if (isAA) {
+        price = formatPrice(price);
+        speed = formatSpeed(speed);
+        contextLength = formatContextLength(contextLength);
+      }
 
       return {
         rank: parseInt(rank) || 0,

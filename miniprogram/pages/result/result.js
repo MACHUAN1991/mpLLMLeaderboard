@@ -1,3 +1,5 @@
+const { formatPrice, formatSpeed, formatContextLength } = require('../../utils/formatters');
+
 // pages/result/result.js
 Page({
   data: {
@@ -119,15 +121,28 @@ Page({
     console.log('提取到的 rankings 数量:', rankings.length);
 
     // 兼容字段名：大写或小写下划线或小写
-    const normalizedRankings = rankings.map(item => ({
-      rank: item.Rank || item.rank || 0,
-      modelName: item['Model Name'] || item.model_name || item.modelName || '',
-      organization: item.Organization || item.organization || '',
-      score: item.Score || item.score || 0,
-      price: item.Price || item.price || null,
-      speed: item.Speed || item.speed || null,
-      contextLength: item['Context Window / Context Length'] || item['Context Window'] || item['Context Length'] || item.contextLength || null
-    }));
+    const isAA = (source || this.data.source) === 'artificial-analysis';
+    const normalizedRankings = rankings.map(item => {
+      let price = item.Price || item.price || null;
+      let speed = item.Speed || item.speed || null;
+      let contextLength = item['Context Window / Context Length'] || item['Context Window'] || item['Context Length'] || item.contextLength || null;
+
+      if (isAA) {
+        price = formatPrice(price);
+        speed = formatSpeed(speed);
+        contextLength = formatContextLength(contextLength);
+      }
+
+      return {
+        rank: item.Rank || item.rank || 0,
+        modelName: item['Model Name'] || item.model_name || item.modelName || '',
+        organization: item.Organization || item.organization || '',
+        score: item.Score || item.score || 0,
+        price,
+        speed,
+        contextLength
+      };
+    });
 
     console.log('normalizedRankings:', normalizedRankings);
 
@@ -435,14 +450,7 @@ Page({
             ctx.fillStyle = item.rank <= 3 ? '#ffffff' : '#e0e0e0';
             ctx.font = item.rank <= 3 ? 'bold 15px sans-serif' : '14px sans-serif';
             ctx.textAlign = 'left';
-            const maxModelWidth = isAA ? 420 : 400;
-            let modelName = item.modelName || '';
-            if (ctx.measureText(modelName).width > maxModelWidth) {
-              while (ctx.measureText(modelName + '...').width > maxModelWidth && modelName.length > 0) {
-                modelName = modelName.slice(0, -1);
-              }
-              modelName += '...';
-            }
+            const modelName = item.modelName || '';
             ctx.fillText(modelName, 90, y + (isAA ? 20 : 27));
 
             // AA 额外信息
