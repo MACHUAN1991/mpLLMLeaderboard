@@ -168,8 +168,13 @@ Component({
         try {
           const cached = wx.getStorageSync(CACHE_KEY);
           if (cached && cached.models && cached.lastFetched && (Date.now() - cached.lastFetched) < CACHE_TTL) {
-            resolve(cached.models);
-            return;
+            // 检查缓存是否包含新字段，不包含则刷新
+            const sample = cached.models[0];
+            if (sample && sample.created !== undefined) {
+              resolve(cached.models);
+              return;
+            }
+            console.log('缓存缺少新字段，重新获取');
           }
         } catch (e) {}
 
@@ -207,6 +212,7 @@ Component({
           return;
         }
         const d = result.model;
+        console.log('模型详情原始数据:', JSON.stringify(d).substring(0, 500));
         this.setData({
           loading: false,
           matchFound: true,
