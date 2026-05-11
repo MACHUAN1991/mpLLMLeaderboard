@@ -247,17 +247,28 @@ async function getModels() {
   // 从 OpenRouter API 获取
   console.log('从 OpenRouter API 获取模型数据...');
   const response = await axios.get(OPENROUTER_API, { timeout: 30000 });
-  const models = response.data.data || [];
-  console.log(`获取到 ${models.length} 个模型`);
+  const rawModels = response.data.data || [];
+  console.log(`获取到 ${rawModels.length} 个模型`);
+
+  // 只保留需要的字段，大幅减少缓存体积
+  const models = rawModels.map(m => ({
+    id: m.id,
+    name: m.name,
+    description: m.description || '',
+    context_length: m.context_length || 0,
+    pricing: m.pricing || {},
+    architecture: m.architecture || {},
+    supported_parameters: m.supported_parameters || [],
+    top_provider: m.top_provider || {},
+    knowledge_cutoff: m.knowledge_cutoff || null
+  }));
 
   // 写入缓存（upsert）
   try {
-    // 删除旧缓存
     const oldCache = await db.collection(CACHE_COLLECTION).limit(1).get();
     if (oldCache.data && oldCache.data.length > 0) {
       await db.collection(CACHE_COLLECTION).doc(oldCache.data[0]._id).remove();
     }
-    // 写入新缓存
     await db.collection(CACHE_COLLECTION).add({
       data: { models, lastFetched: now }
     });
