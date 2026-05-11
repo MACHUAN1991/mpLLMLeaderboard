@@ -50,10 +50,10 @@
     <view wx:elif="{{latestRecord}}" class="ranking-container {{currentSource === 'artificial-analysis' ? 'gradient-card-purple' : currentSource === 'arena' ? 'gradient-card-amber' : 'gradient-card-blue'}}">
       <view class="ranking-header">
         <text class="ranking-date source-color-{{currentSource}}">{{latestRecord.date}}</text>
-        <text class="ranking-count">共 {{latestRecord.totalModels}} 个模型</text>
+        <text class="tap-hint">点击模型查看详情</text>
       </view>
       <view class="ranking-list">
-        <view wx:for="{{latestRankings}}" wx:key="rank" class="ranking-card {{item.rank === 1 ? 'gradient-card-gold' : item.rank === 2 ? 'gradient-card-purple' : item.rank === 3 ? 'gradient-card-blue' : 'gradient-card-normal'}}">
+        <view wx:for="{{latestRankings}}" wx:key="rank" class="ranking-card {{item.rank === 1 ? 'gradient-card-gold' : item.rank === 2 ? 'gradient-card-purple' : item.rank === 3 ? 'gradient-card-blue' : 'gradient-card-normal'}}" bindtap="onModelTap" data-name="{{item.modelName}}">
           <view class="ranking-card-header">
             <view class="rank-badge rank-{{item.rank <= 3 ? item.rank : 'normal'}}">{{item.rank}}</view>
             <view class="ranking-model-info">
@@ -86,4 +86,6 @@
 
   <!-- 隐藏的管理入口：底部连续点击5次触发 -->
   <view class="secret-tap-area" bindtap="onSecretTap"></view>
+
+  <model-detail modelName="{{detailModelName}}" show="{{showModelDetail}}" bind:close="onCloseDetail" />
 </view>

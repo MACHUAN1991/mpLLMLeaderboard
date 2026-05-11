@@ -25,7 +25,9 @@ Page({
     // 最新排名相关
     latestRecord: null,
     latestRankings: [],
-    rankingsLoading: false
+    rankingsLoading: false,
+    detailModelName: '',
+    showModelDetail: false
   },
 
   onLoad: function () {
@@ -269,5 +271,16 @@ Page({
     wx.navigateTo({
       url: `/pages/trend/trend?source=${source}&subCategory=${subCategory}`
     });
+  },
+
+  onModelTap: function (e) {
+    const modelName = e.currentTarget.dataset.name;
+    if (modelName) {
+      this.setData({ detailModelName: modelName, showModelDetail: true });
+    }
+  },
+
+  onCloseDetail: function () {
+    this.setData({ showModelDetail: false });
   }
 });

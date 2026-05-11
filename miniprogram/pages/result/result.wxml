@@ -65,7 +65,7 @@
       <view class="col-score">{{source === 'artificial-analysis' ? '智力' : '分数'}}</view>
     </view>
 
-    <view wx:for="{{filteredRankings}}" wx:key="rank" class="ranking-item {{item.rank <= 3 ? 'top-' + item.rank : ''}}">
+    <view wx:for="{{filteredRankings}}" wx:key="rank" class="ranking-item {{item.rank <= 3 ? 'top-' + item.rank : ''}}" bindtap="onModelTap" data-name="{{item.modelName}}">
       <view class="col-rank rank-badge {{item.rank <= 3 ? 'badge-' + item.rank : ''}}">#{{item.rank}}</view>
       <view class="col-model-wrap">
         <text class="col-model">{{item.modelName}}</text>
@@ -88,4 +88,6 @@
 
   <!-- 隐藏的导出画布 -->
   <canvas id="exportCanvas" type="2d" class="export-canvas"></canvas>
+
+  <model-detail modelName="{{detailModelName}}" show="{{showModelDetail}}" bind:close="onCloseDetail" />
 </view>

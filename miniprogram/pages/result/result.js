@@ -19,7 +19,9 @@ Page({
       total: 0,
       showing: 0
     },
-    exportImagePath: ''
+    exportImagePath: '',
+    detailModelName: '',
+    showModelDetail: false
   },
 
   onLoad: function (options) {
@@ -552,5 +554,16 @@ Page({
     wx.switchTab({
       url: '/pages/index/index'
     });
+  },
+
+  onModelTap: function (e) {
+    const modelName = e.currentTarget.dataset.name;
+    if (modelName) {
+      this.setData({ detailModelName: modelName, showModelDetail: true });
+    }
+  },
+
+  onCloseDetail: function () {
+    this.setData({ showModelDetail: false });
   }
 });

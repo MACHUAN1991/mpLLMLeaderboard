@@ -1,0 +1,5 @@
+{
+  "usingComponents": {
+    "model-detail": "/components/model-detail/model-detail"
+  }
+}

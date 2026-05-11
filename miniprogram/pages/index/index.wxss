@@ -197,6 +197,14 @@
   border-radius: var(--radius-pill);
 }
 
+.tap-hint {
+  font-size: 22rpx;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 6rpx 18rpx;
+  border-radius: var(--radius-pill);
+}
+
 /* 卡片排名列表 */
 .ranking-list {
   display: flex;
