@@ -252,8 +252,13 @@ Component({
               outputPrice: this.formatPrice(d.pricing?.completion),
               contextLength: this.formatContextLength(d.context_length),
               modality: d.architecture?.modality || '-',
+              tokenizer: d.architecture?.tokenizer || '-',
+              instructType: d.architecture?.instruct_type || '-',
               knowledgeCutoff: d.knowledge_cutoff || '-',
               maxTokens: d.top_provider?.max_completion_tokens ? this.formatContextLength(d.top_provider.max_completion_tokens) : '-',
+              createdDate: d.created ? this.formatDate(d.created) : '-',
+              huggingFaceUrl: d.hugging_face_id ? 'https://huggingface.co/' + d.hugging_face_id : '',
+              perRequestLimits: this.formatLimits(d.per_request_limits),
               features: this.extractFeatures(d.supported_parameters, d.architecture),
               openRouterUrl: 'https://openrouter.ai/models/' + encodeURIComponent(d.id)
             });
@@ -287,7 +292,13 @@ Component({
 
     formatDate: function (timestamp) {
       if (!timestamp) return '-';
-      const d = new Date(timestamp * 1000);
+      let d;
+      // 兼容秒级时间戳、毫秒级时间戳、日期字符串
+      if (typeof timestamp === 'number') {
+        d = timestamp > 1e12 ? new Date(timestamp) : new Date(timestamp * 1000);
+      } else {
+        d = new Date(timestamp);
+      }
       if (isNaN(d.getTime())) return '-';
       return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
     },
