@@ -260,7 +260,10 @@ async function getModels() {
     architecture: m.architecture || {},
     supported_parameters: m.supported_parameters || [],
     top_provider: m.top_provider || {},
-    knowledge_cutoff: m.knowledge_cutoff || null
+    knowledge_cutoff: m.knowledge_cutoff || null,
+    created: m.created || null,
+    hugging_face_id: m.hugging_face_id || null,
+    per_request_limits: m.per_request_limits || null
   }));
 
   // 写入缓存（upsert）
@@ -304,7 +307,10 @@ function formatModelDetail(model) {
       max_completion_tokens: model.top_provider?.max_completion_tokens || 0,
       is_moderated: model.top_provider?.is_moderated || false
     },
-    knowledge_cutoff: model.knowledge_cutoff || null
+    knowledge_cutoff: model.knowledge_cutoff || null,
+    created: model.created || null,
+    hugging_face_id: model.hugging_face_id || null,
+    per_request_limits: model.per_request_limits || null
   };
 }
 

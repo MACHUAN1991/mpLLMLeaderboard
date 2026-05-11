@@ -181,8 +181,14 @@
   border: 1rpx solid rgba(100, 255, 218, 0.15);
 }
 
-/* OpenRouter 按钮 */
-.openrouter-btn {
+/* 链接按钮 */
+.link-btns {
+  display: flex;
+  gap: 16rpx;
+}
+
+.link-btn {
+  flex: 1;
   text-align: center;
   padding: 24rpx;
   border-radius: var(--radius-md);
@@ -191,4 +197,10 @@
   color: var(--accent);
   font-size: 28rpx;
   font-weight: 500;
+}
+
+.link-btn-secondary {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1rpx solid rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
 }

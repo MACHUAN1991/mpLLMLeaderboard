@@ -60,8 +60,24 @@
           <text class="spec-value">{{modality}}</text>
         </view>
         <view class="spec-item">
+          <text class="spec-label">Tokenizer</text>
+          <text class="spec-value">{{tokenizer}}</text>
+        </view>
+        <view class="spec-item">
+          <text class="spec-label">指令格式</text>
+          <text class="spec-value">{{instructType}}</text>
+        </view>
+        <view class="spec-item">
           <text class="spec-label">知识截止</text>
           <text class="spec-value">{{knowledgeCutoff}}</text>
+        </view>
+        <view class="spec-item">
+          <text class="spec-label">上线时间</text>
+          <text class="spec-value">{{createdDate}}</text>
+        </view>
+        <view class="spec-item">
+          <text class="spec-label">速率限制</text>
+          <text class="spec-value">{{perRequestLimits}}</text>
         </view>
       </view>
 
@@ -70,9 +86,14 @@
         <view wx:for="{{features}}" wx:key="*this" class="feature-tag">{{item}}</view>
       </view>
 
-      <!-- OpenRouter 链接 -->
-      <view class="openrouter-btn" bindtap="onOpenRouter">
-        <text>在 OpenRouter 查看</text>
+      <!-- 链接按钮 -->
+      <view class="link-btns">
+        <view class="link-btn" bindtap="onOpenRouter">
+          <text>OpenRouter</text>
+        </view>
+        <view wx:if="{{huggingFaceUrl}}" class="link-btn link-btn-secondary" bindtap="onHuggingFace">
+          <text>HuggingFace</text>
+        </view>
       </view>
     </view>
   </view>

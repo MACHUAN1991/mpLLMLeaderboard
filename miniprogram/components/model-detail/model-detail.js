@@ -115,7 +115,10 @@ function slimModel(m) {
     architecture: m.architecture || {},
     supported_parameters: m.supported_parameters || [],
     top_provider: m.top_provider || {},
-    knowledge_cutoff: m.knowledge_cutoff || null
+    knowledge_cutoff: m.knowledge_cutoff || null,
+    created: m.created || null,
+    hugging_face_id: m.hugging_face_id || null,
+    per_request_limits: m.per_request_limits || null
   };
 }
 
@@ -136,8 +139,13 @@ Component({
     outputPrice: '',
     contextLength: '',
     modality: '',
+    tokenizer: '',
+    instructType: '',
     knowledgeCutoff: '',
     maxTokens: '',
+    createdDate: '',
+    huggingFaceUrl: '',
+    perRequestLimits: '',
     features: [],
     openRouterUrl: ''
   },
@@ -209,8 +217,13 @@ Component({
           outputPrice: this.formatPrice(d.pricing?.completion),
           contextLength: this.formatContextLength(d.context_length),
           modality: d.architecture?.modality || '-',
+          tokenizer: d.architecture?.tokenizer || '-',
+          instructType: d.architecture?.instruct_type || '-',
           knowledgeCutoff: d.knowledge_cutoff || '-',
           maxTokens: d.top_provider?.max_completion_tokens ? this.formatContextLength(d.top_provider.max_completion_tokens) : '-',
+          createdDate: d.created ? this.formatDate(d.created) : '-',
+          huggingFaceUrl: d.hugging_face_id ? 'https://huggingface.co/' + d.hugging_face_id : '',
+          perRequestLimits: this.formatLimits(d.per_request_limits),
           features: this.extractFeatures(d.supported_parameters, d.architecture),
           openRouterUrl: 'https://openrouter.ai/models/' + encodeURIComponent(d.id)
         });
@@ -272,6 +285,22 @@ Component({
       return String(num);
     },
 
+    formatDate: function (timestamp) {
+      if (!timestamp) return '-';
+      const d = new Date(timestamp * 1000);
+      if (isNaN(d.getTime())) return '-';
+      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    },
+
+    formatLimits: function (limits) {
+      if (!limits) return '-';
+      const parts = [];
+      if (limits.max_request_length) parts.push('请求: ' + this.formatContextLength(limits.max_request_length));
+      if (limits.max_prompt_tokens) parts.push('输入: ' + this.formatContextLength(limits.max_prompt_tokens));
+      if (limits.max_completion_tokens) parts.push('输出: ' + this.formatContextLength(limits.max_completion_tokens));
+      return parts.length > 0 ? parts.join(', ') : '-';
+    },
+
     extractFeatures: function (params, arch) {
       const features = [];
       if (!params) return features;
@@ -293,6 +322,15 @@ Component({
       if (this.data.openRouterUrl) {
         wx.setClipboardData({
           data: this.data.openRouterUrl,
+          success: () => { wx.showToast({ title: '链接已复制', icon: 'success' }); }
+        });
+      }
+    },
+
+    onHuggingFace: function () {
+      if (this.data.huggingFaceUrl) {
+        wx.setClipboardData({
+          data: this.data.huggingFaceUrl,
           success: () => { wx.showToast({ title: '链接已复制', icon: 'success' }); }
         });
       }
