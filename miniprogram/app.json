@@ -3,7 +3,8 @@
     "pages/index/index",
     "pages/admin/admin",
     "pages/result/result",
-    "pages/trend/trend"
+    "pages/trend/trend",
+    "pages/cc-detail/cc-detail"
   ],
   "window": {
     "backgroundTextStyle": "light",

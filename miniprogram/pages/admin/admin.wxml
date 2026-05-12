@@ -67,6 +67,19 @@
     </button>
   </view>
 
+  <!-- Claude Code数据抓取测试 -->
+  <view class="cc-fetch-section">
+    <view class="section-header">
+      <view class="section-title">Claude Code排行榜</view>
+    </view>
+    <button class="btn-cc-fetch" bindtap="fetchClaudeCodeData" loading="{{ccFetching}}">
+      {{ccFetching ? '抓取中...' : '手动抓取Claude Code数据'}}
+    </button>
+    <text wx:if="{{ccFetchResult}}" class="cc-fetch-result {{ccFetchResult.success ? 'success' : 'error'}}">
+      {{ccFetchResult.success ? '抓取成功: ' + ccFetchResult.totalModels + '个模型 (' + ccFetchResult.date + ')' : '抓取失败: ' + ccFetchResult.error}}
+    </text>
+  </view>
+
   <!-- 批量结果汇总 -->
   <view wx:if="{{batchResults}}" class="batch-summary">
     <view class="summary-row">

@@ -628,3 +628,44 @@
   border-radius: var(--radius-pill);
   background: rgba(255, 82, 82, 0.06);
 }
+
+/* Claude Code抓取区域 */
+.cc-fetch-section {
+  margin-top: 32rpx;
+  padding-top: 32rpx;
+  border-top: 1rpx solid rgba(255, 255, 255, 0.06);
+}
+
+.btn-cc-fetch {
+  background: linear-gradient(135deg, var(--source-cc) 0%, #059669 100%);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 28rpx;
+  font-weight: 600;
+  margin-top: 16rpx;
+}
+
+.btn-cc-fetch[disabled] {
+  opacity: 0.7;
+}
+
+.cc-fetch-result {
+  display: block;
+  margin-top: 16rpx;
+  font-size: 24rpx;
+  padding: 16rpx;
+  border-radius: var(--radius-md);
+}
+
+.cc-fetch-result.success {
+  color: var(--accent);
+  background: var(--accent-bg);
+  border: 1rpx solid var(--accent-border);
+}
+
+.cc-fetch-result.error {
+  color: var(--danger);
+  background: var(--danger-bg);
+  border: 1rpx solid rgba(255, 82, 82, 0.25);
+}

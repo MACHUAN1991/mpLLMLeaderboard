@@ -1,6 +1,7 @@
 <view class="container container-{{currentSource}}">
   <view class="header-row">
     <view class="source-tabs">
+      <view class="source-tab {{currentSource === 'claude-code' ? 'active active-cc' : ''}}" data-source="claude-code" bindtap="switchSource">Claude Code</view>
       <view class="source-tab {{currentSource === 'arena' ? 'active active-arena' : ''}}" data-source="arena" bindtap="switchSource">Arena</view>
       <view class="source-tab {{currentSource === 'artificial-analysis' ? 'active active-aa' : ''}}" data-source="artificial-analysis" bindtap="switchSource">Artificial Analysis</view>
       <view class="source-tab {{currentSource === 'huggingface' ? 'active active-hf' : ''}}" data-source="huggingface" bindtap="switchSource">Hugging Face</view>
@@ -31,12 +32,15 @@
   <view class="trend-btn-row" wx:if="{{currentSource === 'huggingface'}}">
     <text class="trend-link trend-hf" bindtap="goTrend" data-source="huggingface">查看排名变化趋势</text>
   </view>
+  <view class="source-desc" wx:if="{{currentSource === 'claude-code'}}">
+    <text>Claude Code用户实际使用的模型排行，基于OpenRouter平台的真实Token使用量数据</text>
+  </view>
 
   <view wx:if="{{loading}}" class="loading">
     <text>加载中...</text>
   </view>
 
-  <view wx:elif="{{empty}}" class="empty-state">
+  <view wx:elif="{{empty || (currentSource === 'claude-code' && claudeCodeLoaded && !claudeCodeRecord)}}" class="empty-state">
     <text class="empty-icon">📊</text>
     <text class="empty-text">暂无排名数据</text>
     <text class="empty-hint">管理员上传后将显示在这里</text>
@@ -47,7 +51,30 @@
     <view wx:if="{{rankingsLoading}}" class="loading">
       <text>加载排名中...</text>
     </view>
-    <view wx:elif="{{latestRecord}}" class="ranking-container {{currentSource === 'artificial-analysis' ? 'gradient-card-purple' : currentSource === 'arena' ? 'gradient-card-amber' : 'gradient-card-blue'}}">
+    <!-- Claude Code排名展示 -->
+    <view wx:elif="{{currentSource === 'claude-code' && claudeCodeRecord}}" class="ranking-container gradient-card-cc">
+      <view class="ranking-header">
+        <text class="ranking-date source-color-cc">{{claudeCodeRecord.date}}</text>
+        <text class="ranking-total-tokens">最近30天总Token: {{claudeCodeRecord.totalTokensFormatted}}</text>
+      </view>
+      <view class="ranking-list">
+        <view wx:for="{{claudeCodeRankings}}" wx:key="rank" class="ranking-card {{item.rank === 1 ? 'gradient-card-gold' : item.rank === 2 ? 'gradient-card-purple' : item.rank === 3 ? 'gradient-card-blue' : 'gradient-card-normal'}}" bindtap="goCCDetail" data-model="{{item.model}}">
+          <view class="ranking-card-header">
+            <view class="rank-badge rank-{{item.rank <= 3 ? item.rank : 'normal'}}">{{item.rank}}</view>
+            <view class="ranking-model-info">
+              <text class="ranking-model-name">{{item.modelName}}</text>
+              <text class="ranking-model-org">{{item.provider}}</text>
+            </view>
+            <view class="ranking-model-stats">
+              <text class="token-usage">{{item.totalTokensFormatted}}</text>
+              <text class="token-percentage">{{item.percentage}}%</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <!-- 其他来源排名展示 -->
+    <view wx:elif="{{latestRecord && currentSource !== 'claude-code'}}" class="ranking-container {{currentSource === 'artificial-analysis' ? 'gradient-card-purple' : currentSource === 'arena' ? 'gradient-card-amber' : 'gradient-card-blue'}}">
       <view class="ranking-header">
         <text class="ranking-date source-color-{{currentSource}}">{{latestRecord.date}}</text>
         <text class="tap-hint">点击模型查看详情</text>

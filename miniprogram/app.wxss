@@ -20,6 +20,8 @@ page {
   --source-arena-bg: rgba(224, 151, 90, 0.15);
   --source-hf: #7fb3d3;
   --source-hf-bg: rgba(127, 179, 211, 0.15);
+  --source-cc: #10b981;
+  --source-cc-bg: rgba(16, 185, 129, 0.15);
 
   /* 渐变卡片色系 */
   --grad-gold-from: #ffd700;
@@ -101,10 +103,19 @@ page {
   box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.15);
 }
 
+/* Claude Code绿色渐变卡片 */
+.gradient-card-cc {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(5, 150, 105, 0.04) 100%);
+  border: 1rpx solid rgba(16, 185, 129, 0.2);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8rpx 32rpx rgba(16, 185, 129, 0.08), inset 0 1rpx 0 rgba(255, 255, 255, 0.06);
+}
+
 /* AA/Arena/HF 来源容器 - 统一背景 */
 .container-aa,
 .container-arena,
-.container-hf {
+.container-hf,
+.container-claude-code {
   background: linear-gradient(160deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
 }
 
@@ -180,6 +191,7 @@ page {
 .source-color-artificial-analysis { color: var(--source-aa); }
 .source-color-arena { color: var(--source-arena); }
 .source-color-huggingface { color: var(--source-hf); }
+.source-color-claude-code, .source-color-cc { color: var(--source-cc); }
 
 /* ========== 通用布局 ========== */
 .loading {

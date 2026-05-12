@@ -6,7 +6,7 @@ Page({
     records: [],
     loading: true,
     empty: true,
-    currentSource: 'arena',
+    currentSource: 'claude-code',
     arenaSubCategories: [
       { key: 'text', label: 'Text' },
       { key: 'search', label: 'Search' },
@@ -27,7 +27,12 @@ Page({
     latestRankings: [],
     rankingsLoading: false,
     detailModelName: '',
-    showModelDetail: false
+    showModelDetail: false,
+    // Claude Code相关
+    claudeCodeRecord: null,
+    claudeCodeRankings: [],
+    claudeCodeLoading: false,
+    claudeCodeLoaded: false
   },
 
   onLoad: function () {
@@ -40,7 +45,11 @@ Page({
         empty: cached.data.length === 0
       });
       this.applyFilter();
-      this.loadLatestRankings();
+      if (this.data.currentSource === 'claude-code') {
+        this.loadClaudeCodeRankings();
+      } else {
+        this.loadLatestRankings();
+      }
     }
     this.loadHistory();
   },
@@ -85,13 +94,18 @@ Page({
         console.log('历史记录:', res.result);
         if (res.result.success) {
           const data = res.result.data || [];
+          const isClaudeCode = this.data.currentSource === 'claude-code';
           this.setData({
             records: data,
-            empty: data.length === 0,
+            empty: !isClaudeCode && data.length === 0,
             loading: false
           });
           this.applyFilter();
-          this.loadLatestRankings();
+          if (this.data.currentSource === 'claude-code') {
+            this.loadClaudeCodeRankings();
+          } else {
+            this.loadLatestRankings();
+          }
           // 写入缓存
           wx.setStorageSync('history_cache', { data, time: Date.now() });
         } else {
@@ -229,8 +243,12 @@ Page({
   switchSource: function (e) {
     const source = e.currentTarget.dataset.source;
     this.setData({ currentSource: source });
-    this.applyFilter();
-    this.loadLatestRankings();
+    if (source === 'claude-code') {
+      this.loadClaudeCodeRankings();
+    } else {
+      this.applyFilter();
+      this.loadLatestRankings();
+    }
   },
 
   // 切换Arena子分类
@@ -244,6 +262,11 @@ Page({
   // 根据来源筛选记录
   applyFilter: function () {
     const { records, currentSource, currentSubCategory } = this.data;
+    // Claude Code不依赖analysis_records，不设empty
+    if (currentSource === 'claude-code') {
+      this.setData({ filteredCount: 0, displayRecords: [] });
+      return;
+    }
     let filtered = records;
     if (currentSource !== 'all') {
       filtered = records.filter(item => item.source === currentSource);
@@ -282,5 +305,63 @@ Page({
 
   onCloseDetail: function () {
     this.setData({ showModelDetail: false });
+  },
+
+  // 加载Claude Code排行榜数据
+  loadClaudeCodeRankings: function () {
+    this.setData({ claudeCodeLoading: true });
+
+    // 先读缓存快速展示
+    const cached = wx.getStorageSync('claude_code_cache');
+    if (cached && cached.data && cached.data.rankings && cached.data.rankings.length > 0) {
+      const cacheAge = Date.now() - cached.time;
+      // 缓存1小时内有效
+      if (cacheAge < 3600000) {
+        this.setData({
+          claudeCodeRecord: cached.data,
+          claudeCodeRankings: cached.data.rankings,
+          claudeCodeLoading: false,
+          claudeCodeLoaded: true
+        });
+      }
+    }
+
+    // 从云端获取最新数据
+    wx.cloud.callFunction({
+      name: 'getClaudeCodeRankings',
+      success: (res) => {
+        if (res.result.success && res.result.data && res.result.data.length > 0) {
+          const latest = res.result.data[0];
+          if (latest.rankings && latest.rankings.length > 0) {
+            this.setData({
+              claudeCodeRecord: latest,
+              claudeCodeRankings: latest.rankings,
+              claudeCodeLoading: false,
+              claudeCodeLoaded: true
+            });
+            // 写入缓存
+            wx.setStorageSync('claude_code_cache', { data: latest, time: Date.now() });
+          } else {
+            this.setData({ claudeCodeLoading: false, claudeCodeLoaded: true });
+          }
+        } else {
+          this.setData({ claudeCodeLoading: false, claudeCodeLoaded: true });
+        }
+      },
+      fail: (err) => {
+        console.error('获取Claude Code排名失败:', err);
+        this.setData({ claudeCodeLoading: false, claudeCodeLoaded: true });
+      }
+    });
+  },
+
+  // 跳转Claude Code详情页
+  goCCDetail: function (e) {
+    const model = e.currentTarget.dataset.model;
+    if (model) {
+      wx.navigateTo({
+        url: `/pages/cc-detail/cc-detail?model=${encodeURIComponent(model)}`
+      });
+    }
   }
 });

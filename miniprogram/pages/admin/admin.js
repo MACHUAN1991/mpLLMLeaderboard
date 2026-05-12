@@ -29,7 +29,9 @@ Page({
     selectedRecords: {},
     selectedCount: 0,
     records: [],
-    loadingRecords: false
+    loadingRecords: false,
+    ccFetching: false,
+    ccFetchResult: null
   },
 
   onLoad: function () {
@@ -415,6 +417,48 @@ Page({
         imageFileId: fileID || '',
         source,
         subCategory: source === 'arena' ? subCategory : ''
+      }
+    });
+  },
+
+  // 手动抓取Claude Code数据
+  fetchClaudeCodeData: function () {
+    this.setData({ ccFetching: true, ccFetchResult: null });
+
+    wx.cloud.callFunction({
+      name: 'fetchClaudeCodeRankings',
+      timeout: 60000,
+      success: (res) => {
+        console.log('Claude Code抓取结果:', res);
+        if (res.result.success) {
+          this.setData({
+            ccFetching: false,
+            ccFetchResult: {
+              success: true,
+              totalModels: res.result.totalModels,
+              date: res.result.date
+            }
+          });
+          wx.showToast({ title: '抓取成功', icon: 'success' });
+        } else {
+          this.setData({
+            ccFetching: false,
+            ccFetchResult: {
+              success: false,
+              error: res.result.error
+            }
+          });
+        }
+      },
+      fail: (err) => {
+        console.error('Claude Code抓取失败:', err);
+        this.setData({
+          ccFetching: false,
+          ccFetchResult: {
+            success: false,
+            error: err.message || '调用失败'
+          }
+        });
       }
     });
   }

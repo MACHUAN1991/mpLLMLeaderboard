@@ -1,0 +1,227 @@
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary, #0a0a1a);
+  padding: 24rpx;
+  padding-bottom: 180rpx;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400rpx;
+  color: var(--text-secondary, rgba(255,255,255,0.55));
+}
+
+.detail-header {
+  text-align: center;
+  padding: 40rpx 0;
+  border-bottom: 1rpx solid var(--border-color, rgba(255,255,255,0.1));
+  margin-bottom: 32rpx;
+}
+
+.provider-badge {
+  display: inline-block;
+  padding: 8rpx 24rpx;
+  background: var(--accent-color, #64ffda);
+  color: #000;
+  font-size: 24rpx;
+  font-weight: 600;
+  border-radius: 100rpx;
+  text-transform: uppercase;
+  margin-bottom: 16rpx;
+}
+
+.model-name {
+  display: block;
+  font-size: 40rpx;
+  font-weight: 700;
+  color: var(--text-primary, #fff);
+  margin-bottom: 8rpx;
+}
+
+.model-id {
+  display: block;
+  font-size: 24rpx;
+  color: var(--text-tertiary, rgba(255,255,255,0.35));
+}
+
+.section {
+  margin-bottom: 32rpx;
+}
+
+.section-title {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text-primary, #fff);
+  margin-bottom: 16rpx;
+  padding-left: 16rpx;
+  border-left: 4rpx solid var(--source-cc, #10b981);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16rpx;
+}
+
+.stat-item {
+  background: var(--bg-secondary, #12122a);
+  border-radius: var(--radius-lg, 24rpx);
+  padding: 24rpx;
+  text-align: center;
+  border: 1rpx solid var(--border-color, rgba(255,255,255,0.1));
+}
+
+.stat-label {
+  display: block;
+  font-size: 22rpx;
+  color: var(--text-secondary, rgba(255,255,255,0.55));
+  margin-bottom: 8rpx;
+}
+
+.stat-value {
+  display: block;
+  font-size: 36rpx;
+  font-weight: 700;
+  color: var(--text-primary, #fff);
+}
+
+.stat-percentage {
+  color: var(--source-cc, #10b981);
+}
+
+.stat-rank {
+  color: var(--accent-color, #64ffda);
+}
+
+.trend-canvas {
+  width: 100%;
+  height: 300rpx;
+  border-radius: var(--radius-lg, 24rpx);
+  overflow: hidden;
+  margin-bottom: 16rpx;
+}
+
+.trend-summary {
+  max-height: 400rpx;
+  overflow-y: auto;
+}
+
+.trend-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16rpx;
+  border-bottom: 1rpx solid var(--border-color, rgba(255,255,255,0.05));
+}
+
+.trend-date {
+  font-size: 24rpx;
+  color: var(--source-cc, #10b981);
+  flex: 1;
+}
+
+.trend-rank {
+  font-size: 24rpx;
+  color: var(--source-cc, #10b981);
+  font-weight: 600;
+  flex: 1;
+  text-align: center;
+}
+
+.trend-tokens {
+  font-size: 24rpx;
+  color: var(--text-primary, #fff);
+  flex: 1;
+  text-align: right;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16rpx;
+}
+
+.info-item {
+  background: var(--bg-secondary, #12122a);
+  border-radius: var(--radius-lg, 24rpx);
+  padding: 20rpx;
+  border: 1rpx solid var(--border-color, rgba(255,255,255,0.1));
+}
+
+.info-label {
+  display: block;
+  font-size: 22rpx;
+  color: var(--text-secondary, rgba(255,255,255,0.55));
+  margin-bottom: 8rpx;
+}
+
+.info-value {
+  display: block;
+  font-size: 28rpx;
+  color: var(--text-primary, #fff);
+  font-weight: 500;
+}
+
+.feature-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 16rpx;
+}
+
+.feature-tag {
+  padding: 8rpx 16rpx;
+  background: var(--bg-tertiary, rgba(255,255,255,0.05));
+  border-radius: 100rpx;
+  font-size: 22rpx;
+  color: var(--text-secondary, rgba(255,255,255,0.55));
+  border: 1rpx solid var(--border-color, rgba(255,255,255,0.1));
+}
+
+.action-buttons {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: 16rpx;
+  padding: 24rpx;
+  background: var(--bg-primary, #0a0a1a);
+  border-top: 1rpx solid var(--border-color, rgba(255,255,255,0.1));
+}
+
+.btn-copy {
+  flex: 1;
+  background: var(--source-cc, #10b981);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md, 16rpx);
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.btn-back {
+  flex: 1;
+  background: var(--bg-secondary, #12122a);
+  color: var(--text-primary, #fff);
+  border: 1rpx solid var(--border-color, rgba(255,255,255,0.1));
+  border-radius: var(--radius-md, 16rpx);
+  font-size: 28rpx;
+}
+
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 400rpx;
+}
+
+.error-text {
+  color: var(--danger-color, #ff5252);
+  font-size: 28rpx;
+  margin-bottom: 32rpx;
+}

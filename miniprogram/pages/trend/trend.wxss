@@ -21,6 +21,7 @@
 .subtitle-artificial-analysis { color: var(--source-aa); }
 .subtitle-arena { color: var(--source-arena); }
 .subtitle-huggingface { color: var(--source-hf); }
+.subtitle-claude-code { color: var(--source-cc); }
 
 .loading, .empty-state {
   display: flex;

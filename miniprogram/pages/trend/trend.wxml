@@ -4,6 +4,7 @@
     <text class="subtitle subtitle-{{source}}" wx:if="{{source === 'artificial-analysis'}}">Artificial Analysis 近14天排名变化</text>
     <text class="subtitle subtitle-{{source}}" wx:elif="{{source === 'arena'}}">Arena{{subCategory ? ' - ' + subCategory : ''}} 近14天排名变化</text>
     <text class="subtitle subtitle-{{source}}" wx:elif="{{source === 'huggingface'}}">Hugging Face 近14天排名变化</text>
+    <text class="subtitle subtitle-{{source}}" wx:elif="{{source === 'claude-code'}}">Claude Code 近14天使用趋势</text>
   </view>
 
   <view wx:if="{{loading}}" class="loading">
