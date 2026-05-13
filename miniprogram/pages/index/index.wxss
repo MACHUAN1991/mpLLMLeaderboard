@@ -115,6 +115,15 @@
   box-shadow: 0 4rpx 16rpx rgba(224, 151, 90, 0.3);
 }
 
+/* Agent子分类 - 与Agent保持一致的颜色 */
+.sub-category-tab.active-agent {
+  background: linear-gradient(135deg, var(--source-cc) 0%, #059669 100%);
+  color: #fff;
+  border-color: transparent;
+  font-weight: bold;
+  box-shadow: 0 4rpx 16rpx rgba(16, 185, 129, 0.3);
+}
+
 .source-desc {
   text-align: left;
   font-size: 24rpx;

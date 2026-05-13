@@ -1,7 +1,7 @@
 {
-  "name": "fetchClaudeCodeRankings",
+  "name": "fetchAgentRankings",
   "version": "1.0.0",
-  "description": "Fetch Claude Code model usage rankings from OpenRouter",
+  "description": "Fetch Agent model usage rankings from OpenRouter",
   "main": "index.js",
   "dependencies": {
     "wx-server-sdk": "~2.6.3",

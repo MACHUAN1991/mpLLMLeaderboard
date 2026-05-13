@@ -10,23 +10,24 @@ Page({
   },
 
   onLoad: function (options) {
-    const { model } = options;
+    const { model, agentType } = options;
     if (!model) {
       this.setData({ loading: false, error: '缺少模型参数' });
       return;
     }
 
-    this.setData({ model: decodeURIComponent(model) });
+    this.setData({ model: decodeURIComponent(model), agentType: agentType || 'claude-code' });
     this.loadModelData();
     this.loadOpenRouterInfo();
   },
 
   // 加载模型数据
   loadModelData: function () {
-    const { model } = this.data;
+    const { model, agentType } = this.data;
 
     wx.cloud.callFunction({
-      name: 'getClaudeCodeRankings',
+      name: 'getAgentRankings',
+      data: { agentType: agentType || 'claude-code' },
       success: (res) => {
         if (res.result.success && res.result.data.length > 0) {
           const latest = res.result.data[0];
@@ -119,10 +120,10 @@ Page({
 
   // 分享
   onShareAppMessage: function () {
-    const { modelData } = this.data;
+    const { modelData, agentType } = this.data;
     return {
-      title: `Claude Code使用排名 - ${modelData?.modelName || ''}`,
-      path: `/pages/cc-detail/cc-detail?model=${encodeURIComponent(this.data.model)}`
+      title: `Agent使用排名 - ${modelData?.modelName || ''}`,
+      path: `/pages/cc-detail/cc-detail?model=${encodeURIComponent(this.data.model)}&agentType=${agentType}`
     };
   }
 });

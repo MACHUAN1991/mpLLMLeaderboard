@@ -67,17 +67,30 @@
     </button>
   </view>
 
-  <!-- Claude Code数据抓取测试 -->
+  <!-- Agent数据抓取 -->
   <view class="cc-fetch-section">
     <view class="section-header">
-      <view class="section-title">Claude Code排行榜</view>
+      <view class="section-title">Agent排行榜</view>
     </view>
-    <button class="btn-cc-fetch" bindtap="fetchClaudeCodeData" loading="{{ccFetching}}">
-      {{ccFetching ? '抓取中...' : '手动抓取Claude Code数据'}}
-    </button>
-    <text wx:if="{{ccFetchResult}}" class="cc-fetch-result {{ccFetchResult.success ? 'success' : 'error'}}">
-      {{ccFetchResult.success ? '抓取成功: ' + ccFetchResult.totalModels + '个模型 (' + ccFetchResult.date + ')' : '抓取失败: ' + ccFetchResult.error}}
-    </text>
+    <view class="agent-type-row">
+      <view wx:for="{{agentSubCategories}}" wx:key="key"
+            class="agent-type-btn {{selectedAgentType === item.key ? 'active' : ''}}"
+            data-key="{{item.key}}" bindtap="selectAgentType">
+        {{item.label}}
+      </view>
+    </view>
+    <view class="agent-actions-row">
+      <button class="btn-cc-fetch" bindtap="fetchAgentData" loading="{{agentFetching}}">
+        {{agentFetching ? '抓取中...' : '抓取选中'}}
+      </button>
+      <button class="btn-secondary" bindtap="fetchAllAgentData" disabled="{{agentFetching}}">全部抓取</button>
+    </view>
+    <view wx:if="{{agentFetchResults}}" class="agent-results">
+      <view wx:for="{{agentFetchResults}}" wx:key="index" class="cc-fetch-result {{item.success ? 'success' : 'error'}}">
+        {{item.agentType}}: {{item.success ? item.totalModels + '个模型 (' + item.date + ')' : '失败: ' + item.error}}
+      </view>
+      <button class="btn-text" bindtap="clearAgentResults">清除结果</button>
+    </view>
   </view>
 
   <!-- 批量结果汇总 -->
@@ -119,6 +132,36 @@
           <text class="record-count">{{item.totalModels}} 个模型</text>
         </view>
         <text wx:if="{{!deleteMode}}" class="delete-btn" data-recordid="{{item.recordId}}" data-date="{{item.date}}" catchtap="deleteRecord">删除</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Agent记录列表 -->
+  <view class="records-section" style="margin-top: 32rpx;">
+    <view class="section-header">
+      <view class="section-title">Agent记录</view>
+      <view class="section-header-right">
+        <text wx:if="{{agentRecords.length > 0}}" class="batch-delete-toggle" bindtap="toggleAgentDeleteMode">批量删除</text>
+        <text class="batch-delete-toggle" bindtap="loadAgentRecords">刷新</text>
+      </view>
+    </view>
+    <view wx:if="{{agentDeleteMode}}" class="batch-delete-bar">
+      <text class="select-all-text" bindtap="toggleSelectAllAgent">{{selectedAgentCount === agentRecords.length ? '取消全选' : '全选'}}</text>
+      <text class="batch-delete-btn" bindtap="deleteSelectedAgentRecords">删除选中（{{selectedAgentCount}}）</text>
+    </view>
+    <view wx:if="{{loadingAgentRecords}}" class="loading-text">加载中...</view>
+    <view wx:elif="{{agentRecords.length === 0}}" class="empty-text">暂无记录</view>
+    <view wx:else class="record-list">
+      <view wx:for="{{agentRecords}}" wx:key="recordId" class="record-item">
+        <view wx:if="{{agentDeleteMode}}" class="record-checkbox {{selectedAgentRecords[item.recordId] ? 'checked' : ''}}" data-id="{{item.recordId}}" bindtap="toggleSelectAgentRecord">
+          <text wx:if="{{selectedAgentRecords[item.recordId]}}">✓</text>
+        </view>
+        <view class="record-info">
+          <view class="record-source source-cc">{{item.agentType}}</view>
+          <text class="record-date">{{item.date}}</text>
+          <text class="record-count">{{item.totalModels}} 个模型</text>
+        </view>
+        <text wx:if="{{!agentDeleteMode}}" class="delete-btn" data-recordid="{{item.recordId}}" data-date="{{item.date}}" data-agenttype="{{item.agentType}}" catchtap="deleteAgentRecord">删除</text>
       </view>
     </view>
   </view>

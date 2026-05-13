@@ -8,6 +8,12 @@ Page({
     analyzingStep: '',
     batchProgress: { current: 0, total: 0 },
     batchResults: null,
+    agentSubCategories: [
+      { key: 'claude-code', label: 'Claude Code' },
+      { key: 'hermes-agent', label: 'Hermes Agent' },
+      { key: 'openclaw', label: 'OpenClaw' },
+      { key: 'codex', label: 'Codex' }
+    ],
     arenaSubCategories: [
       { key: 'text', label: 'Text' },
       { key: 'search', label: 'Search' },
@@ -31,11 +37,20 @@ Page({
     records: [],
     loadingRecords: false,
     ccFetching: false,
-    ccFetchResult: null
+    ccFetchResult: null,
+    agentFetching: false,
+    agentFetchResults: null,
+    selectedAgentType: 'claude-code',
+    agentRecords: [],
+    loadingAgentRecords: false,
+    agentDeleteMode: false,
+    selectedAgentRecords: {},
+    selectedAgentCount: 0
   },
 
   onLoad: function () {
     this.loadRecords();
+    this.loadAgentRecords();
   },
 
   onUnload: function () {
@@ -94,6 +109,7 @@ Page({
             success: (res) => {
               wx.hideLoading();
               if (res.result.success) {
+                wx.removeStorageSync('history_cache');
                 wx.showToast({ title: '删除成功', icon: 'success' });
                 this.loadRecords();
               } else {
@@ -421,44 +437,225 @@ Page({
     });
   },
 
-  // 手动抓取Claude Code数据
-  fetchClaudeCodeData: function () {
-    this.setData({ ccFetching: true, ccFetchResult: null });
-
+  // 手动抓取Agent数据
+  fetchAgentData: function () {
+    this.setData({ agentFetching: true, agentFetchResults: null });
     wx.cloud.callFunction({
-      name: 'fetchClaudeCodeRankings',
+      name: 'fetchAgentRankings',
+      data: { agentType: this.data.selectedAgentType },
       timeout: 60000,
       success: (res) => {
-        console.log('Claude Code抓取结果:', res);
+        const results = this.data.agentFetchResults || [];
         if (res.result.success) {
-          this.setData({
-            ccFetching: false,
-            ccFetchResult: {
-              success: true,
-              totalModels: res.result.totalModels,
-              date: res.result.date
-            }
+          results.push({
+            agentType: this.data.selectedAgentType,
+            success: true,
+            totalModels: res.result.totalModels,
+            date: res.result.date
           });
-          wx.showToast({ title: '抓取成功', icon: 'success' });
         } else {
-          this.setData({
-            ccFetching: false,
-            ccFetchResult: {
-              success: false,
-              error: res.result.error
-            }
+          results.push({
+            agentType: this.data.selectedAgentType,
+            success: false,
+            error: res.result.error
           });
+        }
+        this.setData({ agentFetching: false, agentFetchResults: results });
+        wx.showToast({ title: res.result.success ? '抓取成功' : '抓取失败', icon: res.result.success ? 'success' : 'none' });
+        if (res.result.success) {
+          this.loadAgentRecords();
         }
       },
       fail: (err) => {
-        console.error('Claude Code抓取失败:', err);
-        this.setData({
-          ccFetching: false,
-          ccFetchResult: {
-            success: false,
-            error: err.message || '调用失败'
+        const results = this.data.agentFetchResults || [];
+        results.push({ agentType: this.data.selectedAgentType, success: false, error: err.message || '调用失败' });
+        this.setData({ agentFetching: false, agentFetchResults: results });
+      }
+    });
+  },
+
+  // 抓取所有Agent数据
+  fetchAllAgentData: function () {
+    const types = ['claude-code', 'hermes-agent', 'openclaw', 'codex'];
+    let index = 0;
+    const results = [];
+    this.setData({ agentFetching: true, agentFetchResults: [] });
+
+    const fetchNext = () => {
+      if (index >= types.length) {
+        this.setData({ agentFetching: false, agentFetchResults: results });
+        wx.showToast({ title: '全部抓取完成', icon: 'success' });
+        this.loadAgentRecords();
+        return;
+      }
+      const agentType = types[index];
+      wx.cloud.callFunction({
+        name: 'fetchAgentRankings',
+        data: { agentType: agentType },
+        timeout: 60000,
+        success: (res) => {
+          if (res.result.success) {
+            results.push({ agentType, success: true, totalModels: res.result.totalModels, date: res.result.date });
+          } else {
+            results.push({ agentType, success: false, error: res.result.error });
           }
+          this.setData({ agentFetchResults: [...results] });
+          index++;
+          setTimeout(fetchNext, 300);
+        },
+        fail: (err) => {
+          results.push({ agentType, success: false, error: err.message || '调用失败' });
+          this.setData({ agentFetchResults: [...results] });
+          index++;
+          setTimeout(fetchNext, 300);
+        }
+      });
+    };
+    fetchNext();
+  },
+
+  // 选择Agent类型
+  selectAgentType: function (e) {
+    this.setData({ selectedAgentType: e.currentTarget.dataset.key });
+  },
+
+  // 清除Agent抓取结果
+  clearAgentResults: function () {
+    this.setData({ agentFetchResults: null });
+  },
+
+  // 加载Agent记录
+  loadAgentRecords: function () {
+    this.setData({ loadingAgentRecords: true });
+    wx.cloud.callFunction({
+      name: 'getAgentRecordsForAdmin',
+      success: (res) => {
+        console.log('Agent records loaded:', res.result);
+        this.setData({
+          agentRecords: res.result.success ? (res.result.data || []) : [],
+          loadingAgentRecords: false
         });
+      },
+      fail: (err) => {
+        console.error('Failed to load agent records:', err);
+        this.setData({ loadingAgentRecords: false });
+      }
+    });
+  },
+
+  // 删除Agent记录
+  deleteAgentRecord: function (e) {
+    const { recordid, date, agenttype } = e.currentTarget.dataset;
+    wx.showModal({
+      title: '确认删除',
+      content: `确定要删除 ${agenttype} 的 ${date || '这条记录'} 吗？`,
+      success: (res) => {
+        if (res.confirm) {
+          wx.showLoading({ title: '删除中...' });
+          wx.cloud.callFunction({
+            name: 'deleteRecord',
+            data: { recordId: recordid, source: 'agent', agentType: agenttype },
+            success: (res) => {
+              wx.hideLoading();
+              if (res.result.success) {
+                // 清除对应Agent类型的缓存
+                wx.removeStorageSync(agenttype + '_cache');
+                wx.showToast({ title: '删除成功', icon: 'success' });
+                this.loadAgentRecords();
+              } else {
+                wx.showToast({ title: '删除失败', icon: 'none' });
+              }
+            },
+            fail: () => {
+              wx.hideLoading();
+              wx.showToast({ title: '删除失败', icon: 'none' });
+            }
+          });
+        }
+      }
+    });
+  },
+
+  // 切换Agent删除模式
+  toggleAgentDeleteMode: function () {
+    this.setData({
+      agentDeleteMode: !this.data.agentDeleteMode,
+      selectedAgentRecords: {},
+      selectedAgentCount: 0
+    });
+  },
+
+  // 选中/取消单条Agent记录
+  toggleSelectAgentRecord: function (e) {
+    const id = e.currentTarget.dataset.id;
+    const selected = { ...this.data.selectedAgentRecords };
+    if (selected[id]) {
+      delete selected[id];
+    } else {
+      selected[id] = true;
+    }
+    this.setData({
+      selectedAgentRecords: selected,
+      selectedAgentCount: Object.keys(selected).length
+    });
+  },
+
+  // 全选/取消全选Agent记录
+  toggleSelectAllAgent: function () {
+    const { agentRecords, selectedAgentRecords } = this.data;
+    if (Object.keys(selectedAgentRecords).length === agentRecords.length) {
+      this.setData({ selectedAgentRecords: {}, selectedAgentCount: 0 });
+    } else {
+      const all = {};
+      agentRecords.forEach(r => { all[r.recordId] = true; });
+      this.setData({ selectedAgentRecords: all, selectedAgentCount: agentRecords.length });
+    }
+  },
+
+  // 批量删除Agent记录
+  deleteSelectedAgentRecords: function () {
+    const { selectedAgentRecords, selectedAgentCount } = this.data;
+    if (selectedAgentCount === 0) {
+      wx.showToast({ title: '请先选择记录', icon: 'none' });
+      return;
+    }
+    wx.showModal({
+      title: '确认批量删除',
+      content: `确定要删除选中的 ${selectedAgentCount} 条记录吗？`,
+      success: (res) => {
+        if (res.confirm) {
+          wx.showLoading({ title: '删除中...' });
+          const ids = Object.keys(selectedAgentRecords);
+          let done = 0;
+          let failed = 0;
+          ids.forEach(id => {
+            const record = this.data.agentRecords.find(r => r.recordId === id);
+            const agentType = record ? record.agentType : 'claude-code';
+            wx.cloud.callFunction({
+              name: 'deleteRecord',
+              data: { recordId: id, source: 'agent', agentType: agentType },
+              success: () => {
+                wx.removeStorageSync(agentType + '_cache');
+                done++;
+                if (done + failed === ids.length) {
+                  wx.hideLoading();
+                  wx.showToast({ title: `删除${failed > 0 ? `完成，${failed}条失败` : '成功'}`, icon: failed > 0 ? 'none' : 'success' });
+                  this.setData({ agentDeleteMode: false, selectedAgentRecords: {}, selectedAgentCount: 0 });
+                  this.loadAgentRecords();
+                }
+              },
+              fail: () => {
+                failed++;
+                if (done + failed === ids.length) {
+                  wx.hideLoading();
+                  wx.showToast({ title: `删除完成，${failed}条失败`, icon: 'none' });
+                  this.setData({ agentDeleteMode: false, selectedAgentRecords: {}, selectedAgentCount: 0 });
+                  this.loadAgentRecords();
+                }
+              }
+            });
+          });
+        }
       }
     });
   }

@@ -6,7 +6,14 @@ Page({
     records: [],
     loading: true,
     empty: true,
-    currentSource: 'claude-code',
+    currentSource: 'agent',
+    agentSubCategories: [
+      { key: 'claude-code', label: 'Claude Code' },
+      { key: 'hermes-agent', label: 'Hermes Agent' },
+      { key: 'openclaw', label: 'OpenClaw' },
+      { key: 'codex', label: 'Codex' }
+    ],
+    currentAgentType: 'claude-code',
     arenaSubCategories: [
       { key: 'text', label: 'Text' },
       { key: 'search', label: 'Search' },
@@ -28,11 +35,11 @@ Page({
     rankingsLoading: false,
     detailModelName: '',
     showModelDetail: false,
-    // Claude Code相关
-    claudeCodeRecord: null,
-    claudeCodeRankings: [],
-    claudeCodeLoading: false,
-    claudeCodeLoaded: false
+    // Agent相关
+    agentRecord: null,
+    agentRankings: [],
+    agentLoading: false,
+    agentLoaded: false
   },
 
   onLoad: function () {
@@ -45,8 +52,8 @@ Page({
         empty: cached.data.length === 0
       });
       this.applyFilter();
-      if (this.data.currentSource === 'claude-code') {
-        this.loadClaudeCodeRankings();
+      if (this.data.currentSource === 'agent') {
+        this.loadAgentRankings();
       } else {
         this.loadLatestRankings();
       }
@@ -94,15 +101,15 @@ Page({
         console.log('历史记录:', res.result);
         if (res.result.success) {
           const data = res.result.data || [];
-          const isClaudeCode = this.data.currentSource === 'claude-code';
+          const isAgent = this.data.currentSource === 'agent';
           this.setData({
             records: data,
-            empty: !isClaudeCode && data.length === 0,
+            empty: !isAgent && data.length === 0,
             loading: false
           });
           this.applyFilter();
-          if (this.data.currentSource === 'claude-code') {
-            this.loadClaudeCodeRankings();
+          if (this.data.currentSource === 'agent') {
+            this.loadAgentRankings();
           } else {
             this.loadLatestRankings();
           }
@@ -243,8 +250,8 @@ Page({
   switchSource: function (e) {
     const source = e.currentTarget.dataset.source;
     this.setData({ currentSource: source });
-    if (source === 'claude-code') {
-      this.loadClaudeCodeRankings();
+    if (source === 'agent') {
+      this.loadAgentRankings();
     } else {
       this.applyFilter();
       this.loadLatestRankings();
@@ -259,11 +266,18 @@ Page({
     this.loadLatestRankings();
   },
 
+  // 切换Agent子分类
+  switchAgentType: function (e) {
+    const key = e.currentTarget.dataset.key;
+    this.setData({ currentAgentType: key });
+    this.loadAgentRankings();
+  },
+
   // 根据来源筛选记录
   applyFilter: function () {
     const { records, currentSource, currentSubCategory } = this.data;
-    // Claude Code不依赖analysis_records，不设empty
-    if (currentSource === 'claude-code') {
+    // Agent不依赖analysis_records，不设empty
+    if (currentSource === 'agent') {
       this.setData({ filteredCount: 0, displayRecords: [] });
       return;
     }
@@ -307,60 +321,70 @@ Page({
     this.setData({ showModelDetail: false });
   },
 
-  // 加载Claude Code排行榜数据
-  loadClaudeCodeRankings: function () {
-    this.setData({ claudeCodeLoading: true });
+  // 加载Agent排行榜数据
+  loadAgentRankings: function () {
+    const { currentAgentType } = this.data;
+    const cacheKey = `${currentAgentType}_cache`;
 
-    // 先读缓存快速展示
-    const cached = wx.getStorageSync('claude_code_cache');
+    // 切换子分类时，先显示加载过渡
+    this.setData({ agentLoading: true });
+
+    // 读取缓存
+    const cached = wx.getStorageSync(cacheKey);
     if (cached && cached.data && cached.data.rankings && cached.data.rankings.length > 0) {
       const cacheAge = Date.now() - cached.time;
       // 缓存1小时内有效
       if (cacheAge < 3600000) {
-        this.setData({
-          claudeCodeRecord: cached.data,
-          claudeCodeRankings: cached.data.rankings,
-          claudeCodeLoading: false,
-          claudeCodeLoaded: true
-        });
+        // 模拟加载过程，确保过渡动画可见
+        setTimeout(() => {
+          this.setData({
+            agentRecord: cached.data,
+            agentRankings: cached.data.rankings,
+            agentLoading: false,
+            agentLoaded: true
+          });
+        }, 200);
+        return;
       }
     }
 
-    // 从云端获取最新数据
+    // 没有缓存，从云端获取最新数据
     wx.cloud.callFunction({
-      name: 'getClaudeCodeRankings',
+      name: 'getAgentRankings',
+      data: { agentType: currentAgentType },
       success: (res) => {
         if (res.result.success && res.result.data && res.result.data.length > 0) {
           const latest = res.result.data[0];
           if (latest.rankings && latest.rankings.length > 0) {
             this.setData({
-              claudeCodeRecord: latest,
-              claudeCodeRankings: latest.rankings,
-              claudeCodeLoading: false,
-              claudeCodeLoaded: true
+              agentRecord: latest,
+              agentRankings: latest.rankings,
+              agentLoading: false,
+              agentLoaded: true
             });
             // 写入缓存
-            wx.setStorageSync('claude_code_cache', { data: latest, time: Date.now() });
+            wx.setStorageSync(cacheKey, { data: latest, time: Date.now() });
           } else {
-            this.setData({ claudeCodeLoading: false, claudeCodeLoaded: true });
+            this.setData({ agentRecord: null, agentRankings: [], agentLoading: false, agentLoaded: true });
           }
         } else {
-          this.setData({ claudeCodeLoading: false, claudeCodeLoaded: true });
+          this.setData({ agentRecord: null, agentRankings: [], agentLoading: false, agentLoaded: true });
         }
       },
       fail: (err) => {
-        console.error('获取Claude Code排名失败:', err);
-        this.setData({ claudeCodeLoading: false, claudeCodeLoaded: true });
+        console.error('获取Agent排名失败:', err);
+        this.setData({ agentLoading: false, agentLoaded: true });
       }
     });
   },
 
-  // 跳转Claude Code详情页
-  goCCDetail: function (e) {
+  // 跳转Agent详情页
+  goAgentDetail: function (e) {
     const model = e.currentTarget.dataset.model;
+    const agentType = e.currentTarget.dataset.agentType;
     if (model) {
       wx.navigateTo({
-        url: `/pages/cc-detail/cc-detail?model=${encodeURIComponent(model)}`
+        url: `/pages/cc-detail/cc-detail?model=${encodeURIComponent(model)}&agentType=${agentType}`
       });
     }
   }

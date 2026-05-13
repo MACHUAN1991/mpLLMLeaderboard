@@ -32,32 +32,22 @@ Page({
   loadTrendData: function (callback) {
     this.setData({ loading: true });
 
-    const isClaudeCode = this.data.source === 'claude-code';
-    const functionName = isClaudeCode ? 'getClaudeCodeTrendData' : 'getTrendData';
-    const params = isClaudeCode ? {} : { source: this.data.source, subCategory: this.data.subCategory };
+    const isAgent = this.data.source === 'agent' || this.data.source === 'claude-code';
+    if (isAgent) {
+      this.setData({ loading: false });
+      wx.showToast({ title: '暂不支持趋势查看', icon: 'none' });
+      if (callback) callback();
+      return;
+    }
+    const functionName = 'getTrendData';
+    const params = { source: this.data.source, subCategory: this.data.subCategory };
 
     wx.cloud.callFunction({
       name: functionName,
       data: params,
       success: (res) => {
         if (res.result.success) {
-          let { dates, models } = res.result.data;
-
-          // Claude Code数据结构需要转换
-          if (isClaudeCode && models) {
-            const normalized = {};
-            Object.entries(models).forEach(([key, info]) => {
-              const name = info.modelName || key;
-              normalized[name] = (info.data || []).map(d => ({
-                date: d.date,
-                rank: d.rank,
-                score: d.totalTokens,
-                organization: info.provider || ''
-              }));
-            });
-            models = normalized;
-          }
-
+          const { dates, models } = res.result.data;
           this.processData(dates, models);
         } else {
           wx.showToast({ title: '加载失败', icon: 'none' });

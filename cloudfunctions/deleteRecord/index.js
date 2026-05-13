@@ -2,15 +2,34 @@ const cloud = require('wx-server-sdk');
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 
+// Agent类型对应的数据库集合
+const AGENT_COLLECTIONS = {
+  'claude-code': 'claude_code_rankings',
+  'hermes-agent': 'hermes_agent_rankings',
+  'openclaw': 'openclaw_rankings',
+  'codex': 'codex_rankings'
+};
+
 exports.main = async (event, context) => {
   const db = cloud.database();
-  const { recordId } = event;
+  const { recordId, source, agentType } = event;
 
   if (!recordId) {
     return { success: false, error: '缺少记录ID' };
   }
 
   try {
+    // Agent类型的记录删除
+    if (source === 'agent' && agentType) {
+      const collectionName = AGENT_COLLECTIONS[agentType];
+      if (collectionName) {
+        await db.collection(collectionName)
+          .where({ recordId })
+          .remove();
+      }
+      return { success: true };
+    }
+
     // 删除主记录
     await db.collection('analysis_records')
       .where({ recordId })

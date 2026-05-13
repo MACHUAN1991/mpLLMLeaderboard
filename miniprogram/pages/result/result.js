@@ -206,7 +206,7 @@ Page({
 
   // 切换筛选面板
   toggleFilter: function () {
-    this.setData({ showFilter: !this.showFilter });
+    this.setData({ showFilter: !this.data.showFilter });
   },
 
   // 厂商筛选

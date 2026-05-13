@@ -71,11 +71,6 @@ exports.main = async (event, context) => {
       }
     });
 
-    // 异步清理14天前的旧数据（不阻塞返回）
-    cloud.callFunction({ name: 'cleanOldData' }).catch(err => {
-      console.error('清理旧数据失败:', err.message);
-    });
-
     return {
       success: true,
       recordId,

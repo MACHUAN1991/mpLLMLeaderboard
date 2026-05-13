@@ -3,12 +3,36 @@ const axios = require('axios')
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 
-const CLAUDE_CODE_URL = 'https://openrouter.ai/apps/claude-code'
+// Agent类型对应的OpenRouter路径
+const AGENT_URLS = {
+  'claude-code': 'https://openrouter.ai/apps/claude-code',
+  'hermes-agent': 'https://openrouter.ai/apps/hermes-agent',
+  'openclaw': 'https://openrouter.ai/apps/openclaw',
+  'codex': 'https://openrouter.ai/apps/codex'
+}
+
+// Agent类型对应的数据库集合
+const AGENT_COLLECTIONS = {
+  'claude-code': 'claude_code_rankings',
+  'hermes-agent': 'hermes_agent_rankings',
+  'openclaw': 'openclaw_rankings',
+  'codex': 'codex_rankings'
+}
 
 exports.main = async (event, context) => {
+  const agentType = event.agentType || 'claude-code'
+
+  // 验证agent类型
+  if (!AGENT_URLS[agentType]) {
+    return { success: false, error: 'Invalid agent type' }
+  }
+
+  const url = AGENT_URLS[agentType]
+  const collectionName = AGENT_COLLECTIONS[agentType]
+
   try {
     // 1. 爬取页面
-    const response = await axios.get(CLAUDE_CODE_URL, {
+    const response = await axios.get(url, {
       timeout: 30000,
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
@@ -16,10 +40,9 @@ exports.main = async (event, context) => {
     })
 
     const html = response.data
-    console.log('HTML length:', html.length)
+    console.log(`[${agentType}] HTML length:`, html.length)
 
     // 2. 提取appModelAnalytics数组
-    // 数据格式: appModelAnalytics\":[{\"date\":\"2026-05-12\",\"model_permaslug\":\"...\",\"total_tokens\":...}]
     const startIndex = html.indexOf('appModelAnalytics')
     if (startIndex === -1) {
       return { success: false, error: 'appModelAnalytics not found in page' }
@@ -44,19 +67,18 @@ exports.main = async (event, context) => {
     }
 
     const arrayStr = html.substring(arrayStart, arrayEnd)
-    console.log('Array string length:', arrayStr.length)
+    console.log(`[${agentType}] Array string length:`, arrayStr.length)
 
-    // 解析JSON（需要先处理转义）
+    // 解析JSON
     let analytics
     try {
       analytics = JSON.parse(arrayStr.replace(/\\"/g, '"'))
     } catch (e) {
-      console.log('JSON parse error:', e.message)
-      // 尝试直接解析（可能不需要处理转义）
+      console.log(`[${agentType}] JSON parse error:`, e.message)
       try {
         analytics = JSON.parse(arrayStr)
       } catch (e2) {
-        console.log('JSON parse error 2:', e2.message)
+        console.log(`[${agentType}] JSON parse error 2:`, e2.message)
         return { success: false, error: 'Failed to parse JSON data' }
       }
     }
@@ -65,16 +87,16 @@ exports.main = async (event, context) => {
       return { success: false, error: 'No data extracted' }
     }
 
-    console.log('Extracted', analytics.length, 'models')
-    return await saveRankings(analytics)
+    console.log(`[${agentType}] Extracted`, analytics.length, 'models')
+    return await saveRankings(analytics, agentType, collectionName)
 
   } catch (error) {
-    console.error('Error fetching Claude Code rankings:', error)
+    console.error(`[${agentType}] Error fetching rankings:`, error)
     return { success: false, error: error.message }
   }
 }
 
-async function saveRankings(analytics) {
+async function saveRankings(analytics, agentType, collectionName) {
   const db = cloud.database()
 
   // 3. 按token使用量排序
@@ -102,15 +124,15 @@ async function saveRankings(analytics) {
 
   // 6. 生成记录
   const recordId = generateUUID()
-  // 统一日期格式: 2026-05-12 -> 2026.5.12
   const rawDate = analytics[0]?.date || new Date().toISOString().split('T')[0]
   const dateParts = rawDate.split('-')
   const date = `${dateParts[0]}.${parseInt(dateParts[1])}.${parseInt(dateParts[2])}`
 
   // 7. 保存到数据库
-  await db.collection('claude_code_rankings').add({
+  await db.collection(collectionName).add({
     data: {
       recordId,
+      agentType,
       date,
       timestamp: Date.now(),
       totalModels: rankings.length,
@@ -125,20 +147,20 @@ async function saveRankings(analytics) {
   // 8. 清理旧数据（保留最近14天）
   const fourteenDaysAgo = Date.now() - 14 * 24 * 60 * 60 * 1000
   try {
-    const oldRecords = await db.collection('claude_code_rankings')
+    const oldRecords = await db.collection(collectionName)
       .where({
         timestamp: db.command.lt(fourteenDaysAgo)
       })
       .get()
 
     for (const record of oldRecords.data) {
-      await db.collection('claude_code_rankings').doc(record._id).remove()
+      await db.collection(collectionName).doc(record._id).remove()
     }
   } catch (e) {
-    console.log('Clean old data error:', e)
+    console.log(`[${agentType}] Clean old data error:`, e)
   }
 
-  return { success: true, recordId, totalModels: rankings.length, date }
+  return { success: true, recordId, totalModels: rankings.length, date, agentType }
 }
 
 function formatModelName(slug) {
